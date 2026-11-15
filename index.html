@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>트리케라톱스 월드 시험</title>
+<style>
+  :root{
+    --paper:#EDF0EA; --panel:#E2E8E0; --line:#C3CCC0;
+    --fir:#223A33; --ink:#1B2B26; --mist:#62776D;
+    --amber:#D9962B; --amber-deep:#B97B14;
+    --sky:#7FA2B5;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Pretendard","Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:18px 18px 40px}
+  header{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px}
+  h1{font-size:1.35rem; margin:0; letter-spacing:-.01em; color:var(--fir)}
+  header p{margin:0; color:var(--mist); font-size:.92rem}
+
+  /* ---------- 무대 ---------- */
+  #stage{
+    position:relative; width:100%; aspect-ratio:16/9; overflow:hidden;
+    border-radius:10px; background:#9db3b8; border:1px solid var(--line);
+    user-select:none; -webkit-user-select:none; touch-action:none;
+  }
+  #stage.shake{animation:shake .12s linear infinite}
+  @keyframes shake{
+    0%{transform:translate(0,0)} 25%{transform:translate(-2px,1px)}
+    50%{transform:translate(2px,-1px)} 75%{transform:translate(-1px,-2px)} 100%{transform:translate(0,0)}
+  }
+  @media (prefers-reduced-motion:reduce){ #stage.shake{animation:none} }
+  #gl{position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab}
+  #gl:active{cursor:grabbing}
+  #bgSvg,#bgImg,#checker{display:none}
+  #bgImg{background-size:cover; background-position:center; display:none}
+  #checker{
+    display:none;
+    background-color:#cfd6cc;
+    background-image:
+      linear-gradient(45deg,#aeb8ac 25%,transparent 25%,transparent 75%,#aeb8ac 75%),
+      linear-gradient(45deg,#aeb8ac 25%,transparent 25%,transparent 75%,#aeb8ac 75%);
+    background-size:28px 28px; background-position:0 0,14px 14px;
+  }
+  #shadow{
+    position:absolute; left:0; top:0; border-radius:50%;
+    background:radial-gradient(closest-side,rgba(20,18,10,.55),rgba(20,18,10,.28) 60%,rgba(20,18,10,0));
+    pointer-events:none; will-change:transform;
+  }
+  #dino{position:absolute; left:0; top:0; pointer-events:none; will-change:transform}
+  #dino video{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+    opacity:0; transition:opacity .24s linear; background:transparent;
+  }
+  #dino video.on{opacity:1}
+  #dino.outline{outline:2px dashed rgba(217,150,43,.95); outline-offset:-1px}
+  #fg{position:absolute; left:0; right:0; bottom:0; width:100%; height:16%; pointer-events:none}
+
+  #sndPanel{position:absolute; top:12px; right:12px; z-index:6; display:flex; gap:12px; align-items:center; padding:6px 12px; border-radius:10px; background:rgba(34,48,44,.82); color:#fff; font-size:.86rem}
+  #sndPanel label{display:flex; gap:5px; align-items:center; cursor:pointer}
+  #hud{
+    position:absolute; left:12px; top:10px; padding:5px 10px; border-radius:6px;
+    background:rgba(34,58,51,.78); color:#EDF0EA; font-size:.82rem; letter-spacing:.01em;
+    font-variant-numeric:tabular-nums;
+  }
+  #loading{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; background:rgba(34,58,51,.86); color:#EDF0EA; text-align:center; padding:24px; font-size:1rem;
+  }
+  #loading small{color:#BFD0C6; font-size:.86rem; max-width:34em}
+  #loading.err{background:rgba(120,40,30,.92)}
+
+  /* ---------- 조작 영역 ---------- */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px}
+  @media (max-width:820px){ .grid{grid-template-columns:1fr} }
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .card h2{font-size:1rem; margin:0 0 10px; color:var(--fir)}
+  .keys{display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; font-size:.94rem}
+  kbd{
+    display:inline-block; min-width:30px; padding:2px 8px; text-align:center;
+    background:#F7F9F5; border:1px solid #AEB9AB; border-bottom-width:3px; border-radius:6px;
+    font:600 .85rem/1.5 inherit; color:var(--fir);
+  }
+  .keys .k{display:flex; gap:4px; flex-wrap:wrap}
+  .ctl{display:grid; grid-template-columns:7.6em 1fr 3.2em; gap:6px 10px; align-items:center; font-size:.92rem}
+  .ctl output{font-variant-numeric:tabular-nums; color:var(--mist); text-align:right}
+  input[type=range]{width:100%; accent-color:var(--amber-deep)}
+  .opts{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:12px; font-size:.92rem}
+  .opts label{display:flex; align-items:center; gap:6px; cursor:pointer}
+  input[type=checkbox]{accent-color:var(--amber-deep); width:16px; height:16px}
+  .btnrow{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+  button, .filebtn{
+    font:inherit; font-size:.9rem; padding:7px 12px; border-radius:8px; cursor:pointer;
+    background:#F7F9F5; color:var(--fir); border:1px solid #9FAE9D;
+  }
+  button:hover,.filebtn:hover{background:#fff}
+  button:focus-visible,.filebtn:focus-within,input:focus-visible{outline:3px solid var(--amber); outline-offset:2px}
+  .filebtn input{position:absolute; opacity:0; width:1px; height:1px}
+  .filebtn{position:relative; display:inline-block}
+
+  .touch{display:none; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:12px}
+  .touch button{padding:14px 0; font-size:1rem; touch-action:none}
+  @media (pointer:coarse){ .touch{display:grid} }
+
+  .check{margin:14px 0 0; padding:12px 16px; border-left:4px solid var(--amber); background:#F3F5EE; font-size:.92rem; color:#33463F}
+  .check b{color:var(--fir)}
+  footer{margin-top:14px; color:var(--mist); font-size:.84rem}
+  select{font:inherit; font-size:.9rem; padding:2px 6px; border-radius:6px; border:1px solid #9FAE9D; background:#F7F9F5; color:var(--fir)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>트리케라톱스 월드 시험</h1>
+    <p>백악기 말 북미 범람원 (헬크릭층 시대) · 공룡: <select id="selSp"><option value="tri">트리케라톱스</option><option value="trex">티라노사우루스</option><option value="edmo">에드몬토사우루스</option><option value="ptero">익룡</option><option value="truck">사파리 차량</option></select> · 마우스로 시점을 돌려 보세요.</p>
+  </header>
+
+  <div id="stage" aria-label="공룡 시험 무대">
+    <canvas id="gl"></canvas>
+    <div id="dino"></div>
+    <div id="hud">대기</div>
+    <div id="loading"><div>영상을 불러오는 중이에요…</div></div>
+  </div>
+
+  <div class="touch" aria-label="화면 버튼">
+    <button data-hold="ArrowLeft">◀</button>
+    <button data-hold="ArrowRight">▶</button>
+    <button data-hold="ArrowUp">멀리</button>
+    <button data-hold="ArrowDown">가까이</button>
+    <button data-hold="e">먹기</button>
+    <button data-hold="w">뒷걸음</button>
+    <button data-tap="roar">울음</button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>조종 방법</h2>
+      <div class="keys">
+        <span class="k"><kbd>←</kbd><kbd>→</kbd></span><span>옆모습으로 걷기 (왼쪽은 영상이 좌우로 뒤집힙니다)</span>
+        <span class="k"><kbd>↓</kbd></span><span>정면으로 걸어옴 (점점 커짐)</span>
+        <span class="k"><kbd>↑</kbd></span><span>뒷모습으로 멀어짐</span>
+        <span class="k"><kbd>←</kbd><kbd>→</kbd><kbd>+</kbd><kbd>↑</kbd><kbd>↓</kbd></span><span><b>두 키를 함께</b> 누르면 비스듬히 (예: <b>→ + ↓</b> 오른쪽 앞으로, <b>→ + ↑</b> 오른쪽 뒤로). 방향은 <b>회전 속도</b>에 맞춰 천천히 돕니다.</span>
+        <span class="k"><kbd>Shift</kbd></span><span>누르고 걸으면 빠르게</span>
+        <span class="k"><kbd>W</kbd></span><span>누르는 동안 <b>뒷걸음질</b> (보고 있는 방향은 그대로, 뒤로 물러남)</span>
+        <span class="k"><kbd>E</kbd></span><span>누르는 동안 먹기 (옆·정면·앞 비스듬히)</span>
+        <span class="k"><kbd>R</kbd></span><span>울음 (옆·정면·앞 비스듬히)</span>
+        <span class="k"><kbd>마우스 드래그</kbd></span><span><b>시점 돌리기</b>. 방향키는 항상 <b>화면 기준</b>이라, 시점을 돌리면 공룡이 가는 월드 방향도 달라집니다. 휠로 가까이·멀리</span>
+        <span class="k"><kbd>V</kbd></span><span>시점을 처음으로 되돌리기</span>
+        <span class="k"><kbd>Q</kbd><kbd>T</kbd></span><span>뒤쪽 방향일 때만: <b>Q</b> 뒤돌아보기(한 번), <b>T</b> 꼬리 흔들기(누르는 동안)</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>조절</h2>
+      <div class="ctl">
+        <label for="sStride">걸음 폭</label><input id="sStride" type="range" min="0.05" max="0.8" step="0.01" value="0.28"><output id="oStride">0.28</output>
+        <label for="sRate">걷기 재생 속도</label><input id="sRate" type="range" min="0.4" max="2" step="0.05" value="1"><output id="oRate">1.0</output>
+        <label for="sDepth">앞뒤 걸음 속도</label><input id="sDepth" type="range" min="0.05" max="0.6" step="0.01" value="0.22"><output id="oDepth">0.22</output>
+        <label for="sBack">뒷걸음 속도</label><input id="sBack" type="range" min="0.3" max="1" step="0.05" value="0.6"><output id="oBack">0.60</output>
+        <label for="sTurn">회전 속도</label><input id="sTurn" type="range" min="40" max="540" step="10" value="160"><output id="oTurn">160</output>
+        <label for="sSlow">회전 중 감속</label><input id="sSlow" type="range" min="0" max="0.8" step="0.05" value="0.5"><output id="oSlow">0.50</output>
+        <label for="sFade">영상 겹침(초)</label><input id="sFade" type="range" min="0.08" max="0.8" step="0.02" value="0.24"><output id="oFade">0.24</output>
+        <label for="sCamD">카메라 거리(m)</label><input id="sCamD" type="range" min="6" max="40" step="1" value="14"><output id="oCamD">14</output>
+        <label for="sCamH">카메라 높이(m)</label><input id="sCamH" type="range" min="1.5" max="20" step="0.5" value="3.2"><output id="oCamH">3.2</output>
+        <label for="sScale">공룡 크기</label><input id="sScale" type="range" min="0.5" max="1.5" step="0.05" value="1"><output id="oScale">1.0</output>
+      </div>
+      <div class="opts">
+        <label><input id="cShadow" type="checkbox" checked>그림자</label>
+        
+        <label><input id="cOutline" type="checkbox">영상 테두리 보기</label>
+      </div>
+      
+    </section>
+  </div>
+
+  <p class="check"><b>살펴볼 점</b> 벽 네 장이 만나는 <b>모서리</b>가 눈에 띄는지(마우스로 시점을 한 바퀴 돌려 보세요), 하늘이 이어지는지, 바닥 무늬가 반복돼 보이는지, 공룡이 땅에 제대로 서 있는지, 공룡 크기가 풍경에 어울리는지, 멀리 갈수록 넓은 느낌이 나는지.</p>
+  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_steps.wav</b>, <b>ptero_wings.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 15개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
+</div>
+
+<script src="three.min.js"></script>
+<script src="world_tex.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(s){ return document.querySelector(s); };
+  var stage = $('#stage'), dino = $('#dino'), hud = $('#hud'), loading = $('#loading');
+
+  /* 방향별 영상. side·front는 꼭 있어야 하고, back은 있을 때만 씁니다. */
+  /* 공룡 종류: 주소 뒤에 ?sp=trex 를 붙이면 티라노사우루스, 없으면 트리케라톱스 (위쪽 선택 상자로 바꿀 수 있어요) */
+  var SPECIES = {
+    tri:  { name:'트리케라톱스', sounds:{ roar:'roar_tri.mp3' }, steps:'tri_steps.wav', hd:2.8, refH:258, shadow:[3.8,1.7], speed:1.0,
+            FOOT:{ side:0.953, front:0.882, back:0.882, f34:0.882, r34:0.882 },
+            SCALE:{ side:0.88, f34:1, front:1, r34:1, back:1 },
+            GAIT:{ side:{p:0.646,t0:0.958}, f34:{p:0.75,t0:0.583}, front:{p:0.75,t0:1.208}, r34:{p:0.708,t0:1.167}, back:{p:0.75,t0:0.583} } },
+    trex: { name:'티라노사우루스', sounds:{ roar:'roar_trex.mp3' }, steps:'trex_steps.wav', hd:4.7, refH:250, shadow:[5.8,2.1], speed:1.35,
+            FOOT:{"side": 0.882, "front": 0.876, "f34": 0.882, "back": 0.876, "r34": 0.882}, SCALE:{"side": 1.025, "front": 1.06, "f34": 0.984, "back": 0.984, "r34": 1.0}, GAIT:{"side": {"p": 0.917, "t0": 0.5}, "front": {"p": 0.833, "t0": 1.208}, "f34": {"p": 0.75, "t0": 1.208}, "back": {"p": 0.833, "t0": 0.917}, "r34": {"p": 0.958, "t0": 1.208}} },
+    ptero:{ name:'익룡 (헬크릭 아즈다르키드)', sounds:{ roar:'roar_ptero.mp3' }, steps:'ptero_steps.wav', wings:'ptero_wings.wav', hd:2.0, refH:258, shadow:[1.9,1.3], speed:0.9, airSpeed:2.2, alt:5, flight:true, glideRate:{ f_side:0.5 },
+            once:['roar','look','tail','takeoff','land'], onceTail:true,
+            FOOT:{"side": 0.882, "f_side": 0.846, "front": 0.882, "f_front": 0.882, "f34": 0.882, "f_f34": 0.834, "back": 0.882, "f_back": 0.882, "r34": 0.876, "f_r34": 0.828}, SCALE:{"side": 1.223, "f_side": 1.229, "front": 0.985, "f_front": 0.993, "f34": 1.0, "f_f34": 1.183, "back": 1.0, "f_back": 1.016, "r34": 0.992, "f_r34": 1.194}, GAIT:{"side": {"p": 0.792, "t0": 0.875}, "front": {"p": 1.208, "t0": 1.458}, "f34": {"p": 1.375, "t0": 0.792}, "back": {"p": 1.083, "t0": 1.333}, "r34": {"p": 0.792, "t0": 0.708}} },
+    truck:{ name:'탐사 사파리 차량', hd:2.9, refH:299, shadow:[3.0,1.4], speed:1.9, once:[],
+            FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879}, SCALE:{side:1,front:1,back:1,f34:1,r34:1},
+            GAIT:{side:{p:1,t0:0},front:{p:1,t0:0},back:{p:1,t0:0},f34:{p:1,t0:0},r34:{p:1,t0:0}} },
+    edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
+            FOOT:{"side": 0.882, "front": 0.882, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.15, "front": 1.0, "f34": 1.02, "back": 0.949, "r34": 0.963}, GAIT:{"side": {"p": 1.042, "t0": 0.625}, "front": {"p": 0.875, "t0": 0.917}, "f34": {"p": 0.792, "t0": 0.583}, "back": {"p": 0.792, "t0": 1.25}, "r34": {"p": 0.792, "t0": 1.208}} }
+  };
+  var SP_ID = (new URLSearchParams(location.search)).get('sp'); if (!SPECIES[SP_ID]) SP_ID = 'tri';
+  var SP = SPECIES[SP_ID];
+  (function(){
+    var sel = document.getElementById('selSp'); if (sel){ sel.value = SP_ID; sel.addEventListener('change', function(){ location.search = '?sp=' + sel.value; }); }
+    document.title = SP.name + ' 월드 시험';
+    if (SP.sounds){
+      var pan = document.createElement('div'); pan.id = 'sndPanel';
+      pan.innerHTML = '<span>🔊 소리</span><label><input type="checkbox" id="chkRoar" checked> 울음</label><label><input type="checkbox" id="chkStep" checked> ' + (SP.wings ? '발소리·날갯짓' : '발소리') + '</label>';
+      var stg = document.getElementById('stage'); if (stg) stg.appendChild(pan);
+      pan.querySelector('#chkRoar').addEventListener('change', function(){ setSoundOpts(this.checked, sndStepOn); });
+      pan.querySelector('#chkStep').addEventListener('change', function(){ setSoundOpts(sndRoarOn, this.checked); });
+      var kb2 = document.querySelector('.keys');
+      if (kb2) kb2.insertAdjacentHTML('beforeend', '<span class="k"><kbd>M</kbd> <kbd>N</kbd></span><span>M: 모든 소리 끄기 / 켜기 · N: 발소리·날갯짓만 끄기 / 켜기 (AI가 만든 상상의 소리예요)</span>');
+    }
+    if (SP.flight){
+      var kb = document.querySelector('.keys');
+      if (kb){
+        kb.insertAdjacentHTML('beforeend', '<span class="k"><kbd>F</kbd></span><span>이륙 / 착륙 (날고 있을 땐 <b>Shift</b>를 누르면 활강하며 빨리 나아가요)</span>');
+        Array.prototype.forEach.call(kb.querySelectorAll('span'), function(sp){ if (sp.innerHTML.indexOf('꼬리 흔들기(누르는 동안)') >= 0) sp.innerHTML = sp.innerHTML.replace('꼬리 흔들기(누르는 동안)', '날개 펴기(한 번)'); });
+      }
+    } var h = document.querySelector('h1'); if (h) h.textContent = SP.name + ' 월드 시험';
+  })();
+  function EDMO_CLIPS(){
+    var o = {};
+    ['side','front','f34','back','r34'].forEach(function(v){
+      var a = (v === 'back' || v === 'r34') ? ['idle','walk','rev','look','tail'] : ['idle','walk','rev','eat','roar'];
+      o[v] = {}; a.forEach(function(x){ o[v][x] = 'edmo_' + v + '_' + (x === 'rev' ? 'walk_rev' : x) + '.webm'; });
+    });
+    return o;
+  }
+  function TRUCK_CLIPS(){
+    var o = {};
+    ['side','front','f34','back','r34'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm' }; });
+    return o;
+  }
+  function PTERO_CLIPS(){
+    var o = {}, G = ['side','front','f34','back','r34'];
+    G.forEach(function(v){
+      var a = (v === 'back' || v === 'r34') ? ['idle','walk','rev','look','tail'] : ['idle','walk','rev','eat','roar'];
+      o[v] = {}; a.forEach(function(x){ o[v][x] = 'ptero_' + v + '_' + (x === 'rev' ? 'walk_rev' : x) + '.webm'; });
+      o['f_' + v] = {}; ['flap','glide','takeoff','land'].forEach(function(x){ o['f_' + v][x] = 'ptero_f_' + v + '_' + x + '.webm'; });
+    });
+    return o;
+  }
+  var CLIPS = (SP_ID === 'edmo') ? EDMO_CLIPS() : (SP_ID === 'truck') ? TRUCK_CLIPS() : (SP_ID === 'ptero') ? PTERO_CLIPS() : (SP_ID === 'tri') ? {
+    side:  { idle:'idle.webm', walk:'walk.webm', rev:'walk_rev.webm', eat:'eat.webm', roar:'roar.webm' },
+    front: { idle:'front_idle.webm', walk:'front_walk.webm', rev:'front_walk_rev.webm', eat:'front_eat.webm', roar:'front_roar.webm' },
+    back:  { idle:'back_idle.webm', walk:'back_walk.webm', rev:'back_walk_rev.webm', look:'back_look.webm', tail:'back_tail.webm' },
+    f34:   { idle:'f34_idle.webm', walk:'f34_walk.webm', rev:'f34_walk_rev.webm', eat:'f34_eat.webm', roar:'f34_roar.webm' },
+    r34:   { idle:'r34_idle.webm', walk:'r34_walk.webm', rev:'r34_walk_rev.webm', look:'r34_look.webm', tail:'r34_tail.webm' }
+  } : (function(){
+    var o = {}, A = { side:['idle','walk','rev','eat','roar'], front:['idle','walk','rev','eat','roar'], f34:['idle','walk','rev','eat','roar'], back:['idle','walk','rev','look','tail'], r34:['idle','walk','rev','look','tail'] };
+    Object.keys(A).forEach(function(v){ o[v] = {}; A[v].forEach(function(a){ o[v][a] = 'trex_' + v + '_' + (a === 'rev' ? 'walk_rev' : a) + '.webm'; }); });
+    return o; })();
+  var REQ_KEYS = { 'side:idle':true, 'side:walk':true };   // 화면을 열 때 꼭 필요한 영상
+  var FOOT = SP.FOOT;
+  var SCALE = SP.SCALE;
+  /* 방향마다 걷는 영상의 걸음 주기(초)와, 몸이 가장 낮아지는 기준 시점(초). 방향이 바뀔 때 걸음 위치를 이어 주는 데 씁니다. */
+  var GAIT = SP.GAIT;
+  var FOOT_REF = 0.882;                                      // 모든 방향의 발바닥을 맞추는 기준 높이
+  var FLIP = { side:true, f34:true, r34:true, f_side:true, f_f34:true, f_r34:true };           // 좌우로 뒤집는 방향(왼쪽으로 갈 때)
+  var REAR = { back:true, r34:true };                      // 뒤돌아보기·꼬리 흔들기가 있는 방향   // 영상 안에서 발바닥 높이 비율
+  var VLABEL = { side:'옆모습', f34:'앞 비스듬히', front:'정면', r34:'뒤 비스듬히', back:'뒷모습' };
+  var LABEL = { idle:'대기', walk:'걷기', rev:'뒷걸음질', eat:'먹기', roar:'울음', look:'뒤돌아보기', tail:'꼬리 흔들기' };
+  var VLABEL_F = { f_side:'옆모습 (비행)', f_f34:'앞 비스듬히 (비행)', f_front:'정면 (비행)', f_r34:'뒤 비스듬히 (비행)', f_back:'뒷모습 (비행)' };
+  for (var vk in VLABEL_F) VLABEL[vk] = VLABEL_F[vk];
+  LABEL.flap = '날갯짓'; LABEL.glide = '활강'; LABEL.takeoff = '이륙'; LABEL.land = '착륙'; if (SP.onceTail) LABEL.tail = '날개 펴기';
+  if (SP_ID === 'truck'){ LABEL.idle = '정차'; LABEL.walk = '주행'; LABEL.rev = '후진'; }
+  var ASPECT = 338/620;
+
+  var st = { wx:0, wz:0, face:1, view:'side', action:'', key:'', lock:false, hd:0, band:0, air:0, alt:0 };
+  var keys = {}, shiftDown = false;
+  var opt = { stride:0.28, rate:1, depth:0.22, scale:1, shadow:true, turn:160, slow:0.5, fade:0.24, back:0.6, camd:14, camh:3.2 };
+
+  /* ---------- 영상 만들기 ---------- */
+  var vids = {}, avail = {}, reqTotal = 0, reqReady = 0, failed = false;
+  Object.keys(CLIPS).forEach(function(view){
+    Object.keys(CLIPS[view]).forEach(function(act){
+      var key = view + ':' + act;
+      var v = document.createElement('video');
+      v.muted = true; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.preload = 'none';
+      v.loop = (SP.once || ['roar', 'look']).indexOf(act) < 0;
+      v.setAttribute('data-src', CLIPS[view][act]);          // 필요할 때 need()가 내려받아요
+      // 영상마다 크기와 발바닥 높이를 따로 맞춥니다 (겹쳐 보이는 동안에도 크기가 흔들리지 않게)
+      v.style.top = ((FOOT_REF - FOOT[view]) * 100) + '%';
+      v.style.transformOrigin = '50% ' + (FOOT[view] * 100) + '%';
+      v.style.transform = 'scale(' + SCALE[view] + ')';
+      dino.appendChild(v);
+      vids[key] = v;
+      var req = !!REQ_KEYS[key]; if (req) reqTotal++;
+      var done = false;
+      var ok = function(){ if (done) return; done = true; avail[key] = true; if (req) oneReady(); };
+      v.addEventListener('loadeddata', ok);
+      v.addEventListener('canplaythrough', ok);
+      v.addEventListener('error', function(){ avail[key] = false; if (req) fail(); });
+    });
+  });
+  /* ---------- 영상 내려받기: 꼭 필요한 것만 먼저, 나머지는 필요할 때 ---------- */
+  var started = {}, loadQ = [], loadActive = 0, MAXPAR = 3, bgStarted = false;
+  function realStart(key){
+    if (started[key] || !vids[key]) return null; started[key] = true;
+    var v = vids[key]; v.preload = 'auto'; v.src = v.getAttribute('data-src'); v.load(); return v;
+  }
+  function pumpLoad(){
+    while (loadActive < MAXPAR && loadQ.length){
+      var k = loadQ.shift(); if (started[k]) continue;
+      loadActive++;
+      (function(key){
+        var v = realStart(key), done = false;
+        var rel = function(){ if (done) return; done = true; loadActive = Math.max(0, loadActive - 1); pumpLoad(); };
+        if (v){ v.addEventListener('loadeddata', rel); v.addEventListener('error', rel); setTimeout(rel, 6000); } else rel();
+      })(k);
+    }
+  }
+  function queueLoad(key){ if (!vids[key] || started[key] || loadQ.indexOf(key) >= 0) return; loadQ.push(key); pumpLoad(); }   // 천천히, 순서대로
+  function need(key){ if (!vids[key] || started[key]) return; var i = loadQ.indexOf(key); if (i >= 0) loadQ.splice(i, 1); realStart(key); }   // 지금 바로
+  function ensureThen(list, fn){                                                  // 영상이 준비되면 실행 (최대 8초 기다려요)
+    var ok = function(){ for (var i = 0; i < list.length; i++){ if (!avail[list[i]]) return false; } return true; };
+    if (ok()){ fn(); return; }
+    list.forEach(need); hud.textContent = '영상을 불러오는 중…';
+    var t0 = Date.now();
+    (function wait(){ if (ok()) fn(); else if (Date.now() - t0 < 8000) setTimeout(wait, 120); })();
+  }
+  function startBackground(){                                                    // 다른 방향으로 돌 때 쓰는 대기·걷기 영상만 미리 받아 둬요
+    if (bgStarted) return; bgStarted = true;
+    ['front', 'f34', 'back', 'r34'].forEach(function(v){ queueLoad(v + ':idle'); queueLoad(v + ':walk'); });
+  }
+  need('side:idle'); need('side:walk');
+
+  function oneReady(){
+    reqReady++;
+    if (reqReady >= reqTotal && !failed){ loading.style.display = 'none'; startBackground(); }
+  }
+  function fail(){
+    if (failed) return; failed = true;
+    loading.style.display = 'flex'; loading.className = 'err';
+    loading.innerHTML = '<div>영상 파일을 찾지 못했어요.</div><small>선택한 공룡(' + SP.name + ')의 영상 파일이 이 파일과 같은 폴더에 모두 있는지 확인하고, 크롬이나 엣지에서 다시 열어 주세요.</small>';
+  }
+  setTimeout(function(){ if (!failed) loading.style.display = 'none'; }, 12000);
+
+  function has(view, act){ return !!(CLIPS[view] && CLIPS[view][act] && avail[view + ':' + act]); }
+  function resolve(view, act){
+    if (has(view, act)) return [view, act];
+    if (CLIPS[view] && CLIPS[view][act]) need(view + ':' + act);            // 필요한 영상이 아직 없으면 내려받기 시작
+    if (/^f_/.test(view)){                                                  // 하늘을 나는 중에는 땅 영상으로 바뀌지 않게
+      if (has(view, 'flap')) return [view, 'flap'];
+      if (/^f_/.test(st.view) && has(st.view, 'flap')) return [st.view, 'flap'];
+      if (has('f_side', 'flap')) return ['f_side', 'flap'];
+    }
+    if (has('side', act)) return ['side', act];
+    return ['side', 'idle'];
+  }
+
+  /* ---------- 3D 월드: 벽 4장(하늘 상자) + 하늘 + 바닥 ---------- */
+  var gl = $('#gl'), renderer = null, scene = null, camera = null, skyRig = null, floorMesh = null, shadowGroup = null, shadowMesh = null, P = null;
+  var cam = { yaw:0, pitch:4, dist:14, h:3.2, tx:0, tz:0, ty:0 };
+  (function buildWorld(){
+    function stop(msg){
+      failed = true; loading.style.display = 'flex'; loading.className = 'err';
+      loading.innerHTML = '<div>' + msg[0] + '</div><small>' + msg[1] + '</small>';
+    }
+    if (!window.THREE || !window.TEX){ stop(['3D 파일을 찾지 못했어요.', 'three.min.js와 world_tex.js가 이 파일과 같은 폴더에 있는지 확인해 주세요.']); return; }
+    THREE.ColorManagement.enabled = false;
+    try { renderer = new THREE.WebGLRenderer({ canvas: gl, antialias: true }); }
+    catch (e){ stop(['이 브라우저에서는 3D 화면을 쓸 수 없어요.', '크롬이나 엣지 최신 버전에서 열어 주세요.']); return; }
+    renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0xe6d6b8, 1);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.5, 6000);
+    skyRig = new THREE.Group(); scene.add(skyRig);
+    P = new THREE.Vector3();
+    var aniso = renderer.capabilities.getMaxAnisotropy();
+    var loader = new THREE.TextureLoader();
+    reqTotal += 10;
+    function loadTex(name, repeat){
+      var t = loader.load(window.TEX[name], function(){ oneReady(); }, undefined, function(){ stop(['그림 파일을 읽지 못했어요.', 'world_tex.js가 깨졌을 수 있어요. 파일을 다시 받아 주세요.']); });
+      t.anisotropy = aniso;
+      t.wrapS = t.wrapT = repeat ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+      return t;
+    }
+
+    /* 벽 네 장: 90°씩 이어 붙인 하늘 상자. 카메라를 따라다녀서 아무리 걸어도 지평선은 멀리 그대로입니다. */
+    var R = 1500, PXU = R / 688, YH = 352;            // 688픽셀 = 가로 시야각 90°, YH = 이미지 안의 지평선 행
+    var yc = (384 - YH) * PXU;
+    var wallGeo = new THREE.PlaneGeometry(2 * R, 768 * PXU);
+    var wallVS = 'varying vec2 vUv; varying vec3 vRel; void main(){ vUv = uv; vec4 wp = modelMatrix * vec4(position, 1.0); vRel = wp.xyz - cameraPosition; gl_Position = projectionMatrix * viewMatrix * wp; }';
+    var wallFS = 'uniform sampler2D map; uniform sampler2D mask; varying vec2 vUv; varying vec3 vRel;\n' +
+      'void main(){ vec3 c = texture2D(map, vUv).rgb; float a = texture2D(mask, vUv).r; gl_FragColor = vec4(c, a); }';
+    var walls = { N:{ p:[0, -R], ry:0 }, E:{ p:[R, 0], ry:-Math.PI / 2 }, S:{ p:[0, R], ry:Math.PI }, W:{ p:[-R, 0], ry:Math.PI / 2 } };
+    Object.keys(walls).forEach(function(k){
+      var m = new THREE.ShaderMaterial({ uniforms:{ map:{ value: loadTex(k, false) }, mask:{ value: loadTex('m' + k, false) } },
+        vertexShader: wallVS, fragmentShader: wallFS, transparent:true, depthWrite:false, depthTest:false });
+      var mesh = new THREE.Mesh(wallGeo, m);
+      mesh.position.set(walls[k].p[0], yc, walls[k].p[1]); mesh.rotation.y = walls[k].ry; mesh.renderOrder = 1;
+      skyRig.add(mesh);
+    });
+
+    /* 하늘(천장 이미지): 천정이 가운데, 가장자리가 지평선인 둥근 하늘 사진을 반구에 입힙니다. */
+    var domeFS = 'uniform sampler2D map; uniform sampler2D ring; uniform float tintAmt; varying vec3 vDir;\n' +
+      'float ringU(vec3 d){ vec2 h = d.xz; float f; float idx;\n' +
+      '  if (abs(h.y) >= abs(h.x)){ if (h.y < 0.0){ f = (h.x / (-h.y) + 1.0) * 0.5; idx = 0.0; } else { f = (-h.x / h.y + 1.0) * 0.5; idx = 2.0; } }\n' +
+      '  else { f = (h.y / h.x + 1.0) * 0.5; idx = (h.x > 0.0) ? 1.0 : 3.0; }\n' +
+      '  return (idx + clamp(f, 0.0, 1.0)) * 0.25; }\n' +
+      'void main(){ vec3 d = normalize(vDir); float el = asin(clamp(d.y, 0.0, 1.0)); float r = (1.5707963 - el) / 1.5707963;\n' +
+      '  vec2 h = normalize(d.xz + vec2(1e-6)); float rr = r * 0.47;\n' +
+      '  vec2 uv = vec2(0.5 + rr * h.x, 1.0 - (0.5 + rr * h.y));\n' +
+      '  vec3 sky = texture2D(map, uv).rgb; vec3 hz = texture2D(ring, vec2(ringU(d), 0.5)).rgb;\n' +
+      '  float w = tintAmt * (1.0 - smoothstep(0.07, 0.62, el));\n' +
+      '  gl_FragColor = vec4(mix(sky, hz, w), 1.0); }';
+    var n = window.RING.length, rd = new Uint8Array(n * 4);
+    for (var i = 0; i < n; i++){ rd[i * 4] = window.RING[i][0]; rd[i * 4 + 1] = window.RING[i][1]; rd[i * 4 + 2] = window.RING[i][2]; rd[i * 4 + 3] = 255; }
+    var ringTex = new THREE.DataTexture(rd, n, 1, THREE.RGBAFormat); ringTex.magFilter = ringTex.minFilter = THREE.LinearFilter; ringTex.wrapS = THREE.RepeatWrapping; ringTex.generateMipmaps = false; ringTex.needsUpdate = true;
+    var dome = new THREE.Mesh(new THREE.SphereGeometry(2800, 64, 24, 0, Math.PI * 2, 0, Math.PI / 2),
+      new THREE.ShaderMaterial({ uniforms:{ map:{ value: loadTex('sky', false) }, ring:{ value: ringTex }, tintAmt:{ value: 0.88 } }, vertexShader:'varying vec3 vDir; void main(){ vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: domeFS, side: THREE.BackSide, transparent:true, depthWrite:false, depthTest:false }));
+    dome.renderOrder = 0; skyRig.add(dome);
+
+    /* 바닥: 같은 그림을 크기·각도를 달리해 두 겹으로 섞어 반복이 덜 보이게 하고, 멀어지면 투명해져 벽의 땅과 이어집니다. */
+    var floorFS = 'uniform sampler2D map; uniform float tile; uniform vec3 haze; uniform vec2 fade; varying vec3 vW;\n' +
+      'float nz(vec2 p){ return 0.5 + 0.5 * sin(p.x * 1.3 + 1.7 * sin(p.y * 0.9)) * sin(p.y * 1.1 + 1.3 * sin(p.x * 0.8)); }\n' +
+      'void main(){ vec2 p = vW.xz / tile; vec3 c1 = texture2D(map, p).rgb;\n' +
+      '  mat2 R = mat2(0.8253, -0.5646, 0.5646, 0.8253); vec3 c2 = texture2D(map, R * p * 1.13 + vec2(0.31, 0.57)).rgb;\n' +
+      '  float m = smoothstep(0.30, 0.70, nz(vW.xz * 0.035)); vec3 col = mix(c1, c2, m);\n' +
+      '  float d = distance(vW.xz, cameraPosition.xz); col = mix(col, haze, smoothstep(30.0, 300.0, d) * 0.55);\n' +
+      '  gl_FragColor = vec4(col, 1.0 - smoothstep(fade.x, fade.y, d)); }';
+    floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000).rotateX(-Math.PI / 2),
+      new THREE.ShaderMaterial({ uniforms:{ map:{ value: loadTex('floor', true) }, tile:{ value: 22.0 }, haze:{ value: new THREE.Color(0.86, 0.78, 0.66) }, fade:{ value: new THREE.Vector2(120, 380) } },
+        vertexShader:'varying vec3 vW; void main(){ vec4 wp = modelMatrix * vec4(position, 1.0); vW = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }',
+        fragmentShader: floorFS, transparent:true, depthWrite:false }));
+    floorMesh.renderOrder = 2; scene.add(floorMesh);
+
+    /* 공룡 그림자: 바닥에 눕힌 타원. 몸이 향한 월드 방향으로 길쭉합니다. */
+    var cv = document.createElement('canvas'); cv.width = cv.height = 128;
+    var cx = cv.getContext('2d'), g = cx.createRadialGradient(64, 64, 4, 64, 64, 62);
+    g.addColorStop(0, 'rgba(25,18,10,0.62)'); g.addColorStop(0.55, 'rgba(25,18,10,0.30)'); g.addColorStop(1, 'rgba(25,18,10,0)');
+    cx.fillStyle = g; cx.fillRect(0, 0, 128, 128);
+    shadowMesh = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ map:new THREE.CanvasTexture(cv), transparent:true, depthWrite:false, depthTest:false }));
+    shadowMesh.rotation.x = -Math.PI / 2; shadowMesh.position.y = 0.05; shadowMesh.renderOrder = 3;
+    shadowGroup = new THREE.Group(); shadowGroup.add(shadowMesh); scene.add(shadowGroup);
+  })();
+
+  /* ---------- 동작 전환 ---------- */
+  var pauseTimer = null;
+  function currentRate(){ return opt.rate * (shiftDown ? 1.6 : 1); }
+  function setClip(view, act){
+    var key = view + ':' + act;
+    if (st.key === key) return;
+    var prevKey = st.key, prev = prevKey ? vids[prevKey] : null;
+    var prevView = prevKey ? prevKey.split(':')[0] : '';
+    st.key = key; st.view = view; st.action = act;
+    var v = vids[key], t = 0;
+    // 걷다가 방향만 바뀌면, 0초부터 다시 시작하지 않고 이전 영상과 같은 걸음 위치에서 이어 갑니다
+    if (prev && prevView === view && ((act === 'rev' && /:walk$/.test(prevKey)) || (act === 'walk' && /:rev$/.test(prevKey)))){
+      // 거꾸로 만든 영상이라 같은 자세는 '전체 길이 - 현재 시간' 위치에 있습니다
+      if (v.duration && isFinite(v.duration)) t = Math.max(0, v.duration - prev.currentTime);
+    } else if (act === 'walk' && prev && /:walk$/.test(prevKey) && GAIT[prevView] && GAIT[view]){
+      var g0 = GAIT[prevView], g1 = GAIT[view];
+      var ph = (((prev.currentTime - g0.t0) / g0.p) % 1 + 1) % 1;
+      t = g1.t0 + ph * g1.p;
+      if (v.duration && isFinite(v.duration)) t = t % v.duration;
+    }
+    try { v.currentTime = t; } catch(e){}
+    v.playbackRate = (act === 'walk') ? currentRate() : (act === 'rev') ? currentRate() * opt.back : 1;
+    var p = v.play(); if (p && p.catch) p.catch(function(){});
+    for (var k in vids){ vids[k].classList.toggle('on', k === key); }
+    clearTimeout(pauseTimer);
+    pauseTimer = setTimeout(function(){
+      for (var k in vids){ if (k !== st.key) vids[k].pause(); }
+    }, Math.max(420, opt.fade * 1000 + 180));
+  }
+  function show(view, act){ var r = resolve(view, act); setClip(r[0], r[1]); }
+  function wrapPi(a){ while (a <= -Math.PI) a += 2 * Math.PI; while (a > Math.PI) a -= 2 * Math.PI; return a; }
+  /* 진행 각도(0°=오른쪽, 90°=정면, -90°=뒷모습)를 옆모습/비스듬히/정면·뒷모습 구간으로 나눕니다.
+     경계 근처에서 영상이 깜빡이지 않도록 6°의 여유를 둡니다. */
+  function bandFor(th, prev){
+    var t1 = (prev === 0) ? 22.5 + 6 : 22.5 - 6;
+    if (th < t1) return 0;
+    var t2 = (prev === 2) ? 67.5 - 6 : 67.5 + 6;
+    return th < t2 ? 1 : 2;
+  }
+  /* 영상 파일이 없는 방향은 가까운 방향으로 대신합니다 */
+  function usable(view){
+    if (CLIPS[view] && !has(view, 'walk')){ need(view + ':walk'); need(view + ':idle'); }
+    var order = { f34:['f34','side'], r34:['r34','back','side'], front:['front','side'], back:['back','side'], side:['side'] }[view];
+    for (var i = 0; i < order.length; i++){ if (order[i] === 'side' || has(order[i], 'walk')) return order[i]; }
+    return 'side';
+  }
+
+  /* 소리: 울음(R) · 발소리(걸을 때) · 날갯짓(날 때). 오른쪽 위 상자나 M, N 키로 끄고 켤 수 있어요. */
+  var sndRoarOn = true, sndStepOn = true, sndCache = {}; window.__snd = sndCache;
+  function getAudio(f, loop, vol){
+    var a = sndCache[f];
+    if (!a){ a = new Audio(f); a.loop = !!loop; a.volume = vol; a.preload = 'auto'; sndCache[f] = a; }
+    return a;
+  }
+  function playSound(act){
+    var f = SP.sounds && SP.sounds[act]; if (!f || !sndRoarOn) return;
+    var a = getAudio(f, false, 0.85);
+    try { a.currentTime = 0; } catch (err) {}
+    var pr = a.play(); if (pr && pr.catch) pr.catch(function(){});
+  }
+  function loopSound(f, on, rate, vol){
+    if (!f) return;
+    var a = getAudio(f, true, vol);
+    if (on && sndStepOn){
+      a.playbackRate = Math.max(0.4, Math.min(3, rate));
+      if (a.paused){ var pr = a.play(); if (pr && pr.catch) pr.catch(function(){}); }
+    } else if (!a.paused){ a.pause(); }
+  }
+  function stopSounds(){ for (var k in sndCache){ try { sndCache[k].pause(); } catch (err) {} } }
+  function updateLoopSounds(){
+    if (!SP.steps && !SP.wings) return;
+    var act = (st.key || '').split(':')[1] || '', rate = currentRate();
+    var walking = (st.air === 0) && (act === 'walk' || act === 'rev');
+    var flyAct = (act === 'flap' || act === 'takeoff' || act === 'land');
+    var gr = (act === 'glide' && SP.glideRate) ? SP.glideRate[st.view] : 0;       // 옆모습 활강은 날개가 움직이는 영상이라 느리게 날갯짓 소리
+    loopSound(SP.steps, walking, rate, 0.55);
+    loopSound(SP.wings, flyAct || !!gr, gr ? gr : 1, 0.6);
+  }
+  function setSoundOpts(roar, step){
+    sndRoarOn = roar; sndStepOn = step;
+    var c1 = document.getElementById('chkRoar'), c2 = document.getElementById('chkStep');
+    if (c1) c1.checked = roar; if (c2) c2.checked = step;
+    if (!roar){ var f = SP.sounds && SP.sounds.roar; if (f && sndCache[f]) { try { sndCache[f].pause(); } catch (err) {} } }
+    if (!step) updateLoopSounds();
+  }
+  function baseView(v){ return String(v).replace(/^f_/, ''); }
+  function usableF(view){
+    var k = 'f_' + view;
+    if (has(k, 'flap')) return k;
+    if (CLIPS[k]){ need(k + ':flap'); queueLoad(k + ':glide'); }
+    return (/^f_/.test(st.view) && has(st.view, 'flap')) ? st.view : 'f_side';
+  }
+  function toggleFlight(){
+    if (!SP.flight || st.lock) return;
+    if (st.air === 0){
+      var bv = baseView(st.view), fv = 'f_' + (CLIPS['f_' + bv] ? bv : 'side');
+      ensureThen([fv + ':takeoff', fv + ':flap'], function(){
+        if (st.lock || st.air) return;
+        st.air = 1; st.lock = true; st.key = ''; setClip(fv, 'takeoff');
+        ['land', 'glide'].forEach(function(a){ queueLoad(fv + ':' + a); });    // 이륙한 뒤에 착륙·활강 영상을 받아 둬요
+      });
+    } else if (st.air === 2){ need(usableF(baseView(st.view)) + ':land'); st.air = 3; }
+  }
+  function startOnce(act){
+    if (st.lock || st.air) return;
+    var tv = (CLIPS[st.view] && CLIPS[st.view][act]) ? st.view : 'side';
+    if (!(CLIPS[tv] && CLIPS[tv][act])) return;
+    if (act === 'look' && !(REAR[st.view] && CLIPS[st.view] && CLIPS[st.view].look)) return;
+    ensureThen([tv + ':' + act], function(){
+      if (st.lock || st.air) return;
+      if (act === 'roar') playSound('roar');
+      st.lock = true; st.key = '';
+      if (act === 'look') setClip(st.view, 'look'); else show(st.view, act);
+      if (act === 'roar' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        setTimeout(function(){ if (st.lock) stage.classList.add('shake'); }, 900);
+        setTimeout(function(){ stage.classList.remove('shake'); }, 3400);
+      }
+    });
+  }
+  Object.keys(CLIPS).forEach(function(view){
+    (SP.once || ['roar', 'look']).forEach(function(act){
+      if (!CLIPS[view][act]) return;
+      vids[view + ':' + act].addEventListener('ended', function(){
+        stage.classList.remove('shake'); st.key = '';
+        if (act === 'takeoff'){ st.air = 2; st.lock = false; show(view, 'flap'); }
+        else if (act === 'land'){ st.air = 0; st.alt = 0; st.lock = false; show(baseView(view), 'idle'); }
+        else { st.lock = false; show(view, 'idle'); }
+      });
+    });
+  });
+
+  /* ---------- 입력 ---------- */
+  function norm(e){
+    var k = e.key;
+    if (k.length === 1) k = k.toLowerCase();
+    return k;
+  }
+  window.addEventListener('keydown', function(e){
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range' && e.target.type !== 'checkbox') return;
+    var k = norm(e);
+    if (k === 'Shift') shiftDown = true;
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].indexOf(k) >= 0 || k === ' ') e.preventDefault();
+    if (k === 'm' && !e.repeat){ var allOn = sndRoarOn || sndStepOn; setSoundOpts(!allOn, !allOn); if (allOn) stopSounds(); return; }
+    if (k === 'n' && !e.repeat){ setSoundOpts(sndRoarOn, !sndStepOn); return; }
+    if (k === 'f' && !e.repeat){ toggleFlight(); return; }
+    if (k === 't' && !e.repeat && SP.onceTail){ if (REAR[st.view] && has(st.view, 'tail')) startOnce('tail'); return; }
+    if (k === 'r' && !e.repeat){ startOnce('roar'); return; }
+    if (k === 'q' && !e.repeat){ if (REAR[st.view]) startOnce('look'); return; }
+    if (k === 'v'){ cam.yaw = 0; cam.pitch = 4; return; }
+    keys[k] = true;
+  });
+  window.addEventListener('keyup', function(e){
+    var k = norm(e);
+    if (k === 'Shift') shiftDown = false;
+    delete keys[k];
+  });
+  window.addEventListener('blur', function(){ keys = {}; shiftDown = false; });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-hold]'), function(b){
+    var k = b.getAttribute('data-hold');
+    var on = function(e){ e.preventDefault(); keys[k] = true; };
+    var off = function(){ delete keys[k]; };
+    b.addEventListener('pointerdown', on);
+    ['pointerup','pointerleave','pointercancel'].forEach(function(t){ b.addEventListener(t, off); });
+  });
+  /* 마우스로 시점 돌리기 / 휠로 거리 */
+  var drag = null;
+  stage.addEventListener('pointerdown', function(e){ if (e.target.closest && e.target.closest('button')) return; drag = { x:e.clientX, y:e.clientY }; try { stage.setPointerCapture(e.pointerId); } catch(_){} });
+  stage.addEventListener('pointermove', function(e){
+    if (!drag) return;
+    cam.yaw += (e.clientX - drag.x) * 0.004;
+    cam.pitch = Math.max(-20, Math.min(50, cam.pitch + (e.clientY - drag.y) * 0.15));
+    drag.x = e.clientX; drag.y = e.clientY;
+  });
+  ['pointerup', 'pointercancel'].forEach(function(t){ stage.addEventListener(t, function(){ drag = null; }); });
+  stage.addEventListener('wheel', function(e){
+    e.preventDefault();
+    cam.dist = Math.max(6, Math.min(40, cam.dist * (1 + (e.deltaY > 0 ? 0.08 : -0.08))));
+    opt.camd = cam.dist; $('#sCamD').value = cam.dist; $('#oCamD').textContent = Math.round(cam.dist);
+  }, { passive:false });
+  var tapRoar = document.querySelector('[data-tap="roar"]');
+  if (tapRoar) tapRoar.addEventListener('pointerdown', function(e){ e.preventDefault(); startOnce('roar'); });
+
+  /* ---------- 조절판 ---------- */
+  function bindRange(id, outId, key, digits){
+    var s = $(id), o = $(outId);
+    var upd = function(){
+      opt[key] = parseFloat(s.value); o.textContent = opt[key].toFixed(digits);
+      if ((key === 'rate' || key === 'back') && (st.action === 'walk' || st.action === 'rev') && vids[st.key]) vids[st.key].playbackRate = currentRate() * (st.action === 'rev' ? opt.back : 1);
+      if (key === 'fade') for (var k in vids) vids[k].style.transitionDuration = opt.fade + 's';
+      if (key === 'camd') cam.dist = opt.camd;
+      if (key === 'camh') cam.h = opt.camh;
+    };
+    s.addEventListener('input', upd); upd();
+  }
+  bindRange('#sStride', '#oStride', 'stride', 2);
+  bindRange('#sRate', '#oRate', 'rate', 2);
+  bindRange('#sDepth', '#oDepth', 'depth', 2);
+  bindRange('#sBack', '#oBack', 'back', 2);
+  bindRange('#sTurn', '#oTurn', 'turn', 0);
+  bindRange('#sSlow', '#oSlow', 'slow', 2);
+  bindRange('#sFade', '#oFade', 'fade', 2);
+  bindRange('#sCamD', '#oCamD', 'camd', 0);
+  bindRange('#sCamH', '#oCamH', 'camh', 1);
+  bindRange('#sScale', '#oScale', 'scale', 2);
+  $('#cShadow').addEventListener('change', function(e){ opt.shadow = e.target.checked; if (shadowGroup) shadowGroup.visible = opt.shadow; });
+  $('#cOutline').addEventListener('change', function(e){ dino.classList.toggle('outline', e.target.checked); });
+
+  /* ---------- 매 프레임 ---------- */
+  var last = performance.now(), hudT = 0, sizeW = 0, sizeH = 0;
+  function proj(x, y, z, W, H){ P.set(x, y, z).project(camera); return { x:(P.x * 0.5 + 0.5) * W, y:(1 - (P.y * 0.5 + 0.5)) * H }; }
+  function tick(t){
+    var dt = Math.min(0.05, (t - last) / 1000); last = t;
+    var W = stage.clientWidth, H = stage.clientHeight;
+    if (renderer && (W !== sizeW || H !== sizeH)){ sizeW = W; sizeH = H; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); }
+
+    // 방향키는 화면 기준이라, 카메라가 보는 방향에 맞춰 월드 방향으로 바꿉니다
+    var fx = Math.sin(cam.yaw), fz = Math.cos(cam.yaw), rx = -fz, rz = fx;
+    var air = (st.air === 2 || st.air === 3);
+    if (air){
+      var tgtA = (st.air === 2) ? SP.alt : 0, dA = tgtA - st.alt;
+      st.alt += Math.sign(dA) * Math.min(Math.abs(dA), 3.2 * dt);
+      if (st.air === 3 && st.alt <= 0.01 && !st.lock){
+        var lv = usableF(baseView(st.view));
+        if (has(lv, 'land')){ st.alt = 0; st.air = 4; st.lock = true; st.key = ''; air = false; setClip(lv, 'land'); }
+        else { need(lv + ':land'); st.alt = 0.011; }
+      }
+    }
+    var vA = air ? SP.airSpeed : 1;
+    var vxM = opt.stride * 7.0 * SP.speed * vA, vzM = opt.depth * 8.5 * SP.speed * vA;          // 월드 속도(m/초): 화면 가로 / 화면 앞뒤
+    function walk(c, d, sx, sz){ st.wx += (rx * c * sx - fx * d * sz) * dt; st.wz += (rz * c * sx - fz * d * sz) * dt; }
+
+    if (!st.lock){
+      var dx = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
+      var dz = (keys.ArrowDown ? 1 : 0) - (keys.ArrowUp ? 1 : 0);
+      if (keys.w && !air){
+        // 뒷걸음질: 몸이 보는 방향은 그대로 두고, 반대쪽으로 천천히 물러납니다 (걷기 영상을 거꾸로 재생)
+        show(st.view, 'rev');
+        var rb = currentRate() * opt.back;
+        if (vids[st.key]) vids[st.key].playbackRate = rb;
+        walk(-Math.cos(st.hd), -Math.sin(st.hd), vxM * SCALE[st.view] * rb, vzM * rb);
+      } else if (dx || dz){
+        // 키가 가리키는 방향으로 몸이 정해진 속도로 천천히 돕니다 (한 번에 꺾이지 않음)
+        var target = Math.atan2(dz, dx);
+        var diff = wrapPi(target - st.hd);
+        var err = Math.abs(diff) * 180 / Math.PI;
+        var step = opt.turn * Math.PI / 180 * dt;
+        if (Math.abs(diff) <= step) st.hd = target; else st.hd += (diff >= 0 ? 1 : -1) * step;
+        st.hd = wrapPi(st.hd);
+        var c = Math.cos(st.hd), d = Math.sin(st.hd);
+        if (Math.abs(c) > 0.1) st.face = c > 0 ? 1 : -1;
+        var th = Math.atan2(Math.abs(d), Math.abs(c)) * 180 / Math.PI;
+        st.band = bandFor(th, st.band);
+        var want = st.band === 0 ? 'side' : st.band === 1 ? (d >= 0 ? 'f34' : 'r34') : (d >= 0 ? 'front' : 'back');
+        if (air) show(usableF(want), shiftDown ? 'glide' : 'flap'); else show(usable(want), 'walk');
+        var rate = currentRate();
+        if (vids[st.key]) vids[st.key].playbackRate = air ? ((SP.glideRate && /:glide$/.test(st.key)) ? (SP.glideRate[st.view] || 1) : 1) : rate;
+        // 도는 동안은 속도를 줄이고, 이동은 지금 몸이 향한 방향으로 합니다
+        var sp = 1 - opt.slow * Math.min(1, err / 90);
+        walk(c, d, vxM * SCALE[st.view] * rate * sp, vzM * rate * sp);
+      } else if (keys.e && !air){
+        show(st.view, 'eat');
+      } else if (keys.t && REAR[st.view] && has(st.view, 'tail') && !SP.onceTail && !air){
+        show(st.view, 'tail');
+      } else {
+        if (air) show(usableF(baseView(st.view)), 'flap'); else show(st.view, 'idle');
+      }
+    }
+
+    if (renderer){
+      // 카메라는 공룡을 부드럽게 따라가며, 마우스로 돌린 방향을 유지합니다
+      var k = Math.min(1, dt * 5);
+      cam.ty += (st.alt * 0.55 - cam.ty) * k;
+      cam.tx += (st.wx - cam.tx) * k; cam.tz += (st.wz - cam.tz) * k;
+      camera.position.set(cam.tx - fx * cam.dist, cam.h + cam.ty * 0.5, cam.tz - fz * cam.dist);
+      camera.lookAt(cam.tx, 1.4 + cam.ty + Math.tan(cam.pitch * Math.PI / 180) * cam.dist, cam.tz);
+      camera.updateMatrixWorld(true);
+      skyRig.position.copy(camera.position);
+      floorMesh.position.set(camera.position.x, 0, camera.position.z);
+
+      // 월드 속 공룡 → 화면 위치와 크기 (키 2.8m)
+      var hd = SP.hd * opt.scale;
+      var f0 = proj(st.wx, st.alt, st.wz, W, H), f1 = proj(st.wx, st.alt + hd, st.wz, W, H);
+      var ah = Math.max(8, f0.y - f1.y), sw = ah * 620 / SP.refH, sh = sw * ASPECT;
+      var flip = FLIP[st.view] ? st.face : 1;
+      dino.style.width = sw + 'px'; dino.style.height = sh + 'px';
+      dino.style.transform = 'translate(' + (f0.x - sw / 2) + 'px,' + (f0.y - sh * FOOT_REF) + 'px) scaleX(' + flip + ')';
+
+      // 그림자: 몸이 향한 월드 방향으로 길쭉하게
+      var hc = Math.cos(st.hd), hs = Math.sin(st.hd);
+      var wxh = rx * hc - fx * hs, wzh = rz * hc - fz * hs;
+      shadowGroup.position.set(st.wx, 0, st.wz);
+      shadowGroup.rotation.y = -Math.atan2(wzh, wxh);
+      shadowMesh.scale.set(SP.shadow[0] * opt.scale * (1 + st.alt * 0.04), SP.shadow[1] * opt.scale * (1 + st.alt * 0.04), 1); shadowMesh.material.opacity = Math.max(0.3, 1 - st.alt / 22);
+      renderer.render(scene, camera);
+    }
+
+    hudT += dt;
+    if (hudT > 0.1){
+      hudT = 0;
+      hud.textContent = VLABEL[st.view] + ' · ' + (LABEL[st.action] || '') + (st.action === 'walk' && shiftDown ? ' (빠르게)' : '') + '  ·  출발점에서 ' + Math.round(Math.hypot(st.wx, st.wz)) + 'm';
+    }
+    updateLoopSounds();
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
