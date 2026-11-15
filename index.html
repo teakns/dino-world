@@ -61,7 +61,8 @@
   #dino.outline{outline:2px dashed rgba(217,150,43,.95); outline-offset:-1px}
   #fg{position:absolute; left:0; right:0; bottom:0; width:100%; height:16%; pointer-events:none}
 
-  #sndPanel{position:absolute; top:12px; right:12px; z-index:6; display:flex; gap:12px; align-items:center; padding:6px 12px; border-radius:10px; background:rgba(34,48,44,.82); color:#fff; font-size:.86rem}
+  #sndPanel{flex-wrap:wrap; max-width:440px; justify-content:flex-end; position:absolute; top:12px; right:12px; z-index:6; display:flex; gap:12px; align-items:center; padding:6px 12px; border-radius:10px; background:rgba(34,48,44,.82); color:#fff; font-size:.86rem}
+  #sndCaption{position:absolute; left:50%; bottom:14px; transform:translateX(-50%); width:max-content; max-width:88%; background:rgba(34,48,44,.88); color:#fff; padding:8px 14px; border-radius:10px; font-size:.9rem; line-height:1.5; text-align:center; opacity:0; transition:opacity .4s; pointer-events:none; z-index:6}
   #sndPanel label{display:flex; gap:5px; align-items:center; cursor:pointer}
   #hud{
     position:absolute; left:12px; top:10px; padding:5px 10px; border-radius:6px;
@@ -193,19 +194,19 @@
   /* 방향별 영상. side·front는 꼭 있어야 하고, back은 있을 때만 씁니다. */
   /* 공룡 종류: 주소 뒤에 ?sp=trex 를 붙이면 티라노사우루스, 없으면 트리케라톱스 (위쪽 선택 상자로 바꿀 수 있어요) */
   var SPECIES = {
-    tri:  { name:'트리케라톱스', sounds:{ roar:'roar_tri.mp3' }, steps:'tri_steps.wav', hd:2.8, refH:258, shadow:[3.8,1.7], speed:1.0,
+    tri:  { name:'트리케라톱스', sounds:{ roar:'roar_tri.mp3' }, soundsSci:{ roar:'roar_tri_sci.mp3' }, capSci:"학자 추정: 큰 공룡은 입을 다문 채 내는 낮은 울림을 냈을 가능성이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'tri_steps.wav', hd:2.8, refH:258, shadow:[3.8,1.7], speed:1.0,
             FOOT:{ side:0.953, front:0.882, back:0.882, f34:0.882, r34:0.882 },
             SCALE:{ side:0.88, f34:1, front:1, r34:1, back:1 },
             GAIT:{ side:{p:0.646,t0:0.958}, f34:{p:0.75,t0:0.583}, front:{p:0.75,t0:1.208}, r34:{p:0.708,t0:1.167}, back:{p:0.75,t0:0.583} } },
-    trex: { name:'티라노사우루스', sounds:{ roar:'roar_trex.mp3' }, steps:'trex_steps.wav', hd:4.7, refH:250, shadow:[5.8,2.1], speed:1.35,
+    trex: { name:'티라노사우루스', sounds:{ roar:'roar_trex.mp3' }, soundsSci:{ roar:'roar_trex_sci.mp3' }, capSci:"학자 추정: 티라노 같은 큰 공룡은 악어처럼 낮게 '쿵…쿵' 울렸을 거라는 의견이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'trex_steps.wav', hd:4.7, refH:250, shadow:[5.8,2.1], speed:1.35,
             FOOT:{"side": 0.882, "front": 0.876, "f34": 0.882, "back": 0.876, "r34": 0.882}, SCALE:{"side": 1.025, "front": 1.06, "f34": 0.984, "back": 0.984, "r34": 1.0}, GAIT:{"side": {"p": 0.917, "t0": 0.5}, "front": {"p": 0.833, "t0": 1.208}, "f34": {"p": 0.75, "t0": 1.208}, "back": {"p": 0.833, "t0": 0.917}, "r34": {"p": 0.958, "t0": 1.208}} },
-    ptero:{ name:'익룡 (헬크릭 아즈다르키드)', sounds:{ roar:'roar_ptero.mp3' }, steps:'ptero_steps.wav', wings:'ptero_wings.wav', hd:2.0, refH:258, shadow:[1.9,1.3], speed:0.9, airSpeed:2.2, alt:5, flight:true, glideRate:{ f_side:0.5 },
+    ptero:{ name:'익룡 (헬크릭 아즈다르키드)', sounds:{ roar:'roar_ptero.mp3' }, soundsSci:{ roar:'roar_ptero_sci.mp3' }, capSci:"익룡의 울음은 증거가 거의 없어요. 황새처럼 부리를 부딪치거나 꺽꺽거렸을 거라고 상상해서 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'ptero_steps.wav', wings:'ptero_wings.wav', hd:2.0, refH:258, shadow:[1.9,1.3], speed:0.9, airSpeed:2.2, alt:5, flight:true, glideRate:{ f_side:0.5 },
             once:['roar','look','tail','takeoff','land'], onceTail:true,
             FOOT:{"side": 0.882, "f_side": 0.846, "front": 0.882, "f_front": 0.882, "f34": 0.882, "f_f34": 0.834, "back": 0.882, "f_back": 0.882, "r34": 0.876, "f_r34": 0.828}, SCALE:{"side": 1.223, "f_side": 1.229, "front": 0.985, "f_front": 0.993, "f34": 1.0, "f_f34": 1.183, "back": 1.0, "f_back": 1.016, "r34": 0.992, "f_r34": 1.194}, GAIT:{"side": {"p": 0.792, "t0": 0.875}, "front": {"p": 1.208, "t0": 1.458}, "f34": {"p": 1.375, "t0": 0.792}, "back": {"p": 1.083, "t0": 1.333}, "r34": {"p": 0.792, "t0": 0.708}} },
     truck:{ name:'탐사 사파리 차량', hd:2.9, refH:299, shadow:[3.0,1.4], speed:1.9, once:[],
             FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879}, SCALE:{side:1,front:1,back:1,f34:1,r34:1},
             GAIT:{side:{p:1,t0:0},front:{p:1,t0:0},back:{p:1,t0:0},f34:{p:1,t0:0},r34:{p:1,t0:0}} },
-    edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
+    edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, soundsSci:{ roar:'roar_edmo_sci.mp3' }, capSci:"학자 추정: 새와 악어의 친척이라 오리처럼 낮게 꽥꽥거렸을 수 있다는 의견이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
             FOOT:{"side": 0.882, "front": 0.882, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.15, "front": 1.0, "f34": 1.02, "back": 0.949, "r34": 0.963}, GAIT:{"side": {"p": 1.042, "t0": 0.625}, "front": {"p": 0.875, "t0": 0.917}, "f34": {"p": 0.792, "t0": 0.583}, "back": {"p": 0.792, "t0": 1.25}, "r34": {"p": 0.792, "t0": 1.208}} }
   };
   var SP_ID = (new URLSearchParams(location.search)).get('sp'); if (!SPECIES[SP_ID]) SP_ID = 'tri';
@@ -215,12 +216,20 @@
     document.title = SP.name + ' 월드 시험';
     if (SP.sounds){
       var pan = document.createElement('div'); pan.id = 'sndPanel';
-      pan.innerHTML = '<span>🔊 소리</span><label><input type="checkbox" id="chkRoar" checked> 울음</label><label><input type="checkbox" id="chkStep" checked> ' + (SP.wings ? '발소리·날갯짓' : '발소리') + '</label>';
+      pan.innerHTML = '<span>🔊 소리</span><label><input type="checkbox" id="chkRoar" checked> 울음</label><label><input type="checkbox" id="chkStep" checked> ' + (SP.wings ? '발소리·날갯짓' : '발소리') + '</label>'
+        + (SP.soundsSci ? '<span style="flex-basis:100%;height:0"></span><span>울음 종류</span><label><input type="radio" name="sndMode" id="modeMovie"> 영화식</label><label><input type="radio" name="sndMode" id="modeSci"> 학자 추정</label>' : '');
       var stg = document.getElementById('stage'); if (stg) stg.appendChild(pan);
+      pan.addEventListener('change', function(e){ if (e.target && e.target.blur) e.target.blur(); });
+      var capEl = document.createElement('div'); capEl.id = 'sndCaption'; if (stg) stg.appendChild(capEl);
+      if (SP.soundsSci){
+        pan.querySelector('#modeMovie').addEventListener('change', function(){ setSoundMode('movie'); });
+        pan.querySelector('#modeSci').addEventListener('change', function(){ setSoundMode('sci'); });
+        pan.querySelector(sndMode === 'sci' ? '#modeSci' : '#modeMovie').checked = true;
+      }
       pan.querySelector('#chkRoar').addEventListener('change', function(){ setSoundOpts(this.checked, sndStepOn); });
       pan.querySelector('#chkStep').addEventListener('change', function(){ setSoundOpts(sndRoarOn, this.checked); });
       var kb2 = document.querySelector('.keys');
-      if (kb2) kb2.insertAdjacentHTML('beforeend', '<span class="k"><kbd>M</kbd> <kbd>N</kbd></span><span>M: 모든 소리 끄기 / 켜기 · N: 발소리·날갯짓만 끄기 / 켜기 (AI가 만든 상상의 소리예요)</span>');
+      if (kb2) kb2.insertAdjacentHTML('beforeend', '<span class="k"><kbd>M</kbd> <kbd>N</kbd> <kbd>B</kbd></span><span>M: 모든 소리 끄기 / 켜기 · N: 발소리·날갯짓만 끄기 / 켜기 · B: 울음소리 종류 바꾸기 (영화식 / 학자 추정)</span>');
     }
     if (SP.flight){
       var kb = document.querySelector('.keys');
@@ -504,8 +513,25 @@
     if (!a){ a = new Audio(f); a.loop = !!loop; a.volume = vol; a.preload = 'auto'; sndCache[f] = a; }
     return a;
   }
+  var sndMode = 'movie'; try { if (window.localStorage && localStorage.getItem('dinoSndMode') === 'sci') sndMode = 'sci'; } catch (err) {}
+  var capTimer = null;
+  function showCaption(){
+    var el = document.getElementById('sndCaption'); if (!el || !SP.sounds) return;
+    el.textContent = (sndMode === 'sci' && SP.capSci) ? SP.capSci : '영화식 울음: AI가 만든 상상의 소리예요. 영화 속 포효처럼 들리지만, 실제 공룡은 이렇게 울지 않았을 가능성이 높아요.';
+    el.style.opacity = '1'; clearTimeout(capTimer); capTimer = setTimeout(function(){ el.style.opacity = '0'; }, 7000);
+  }
+  function roarFile(){ return (sndMode === 'sci' && SP.soundsSci && SP.soundsSci.roar) ? SP.soundsSci.roar : (SP.sounds && SP.sounds.roar); }
+  function setSoundMode(m){
+    sndMode = (m === 'sci' && SP.soundsSci) ? 'sci' : 'movie';
+    try { if (window.localStorage) localStorage.setItem('dinoSndMode', sndMode); } catch (err) {}
+    var r1 = document.getElementById('modeMovie'), r2 = document.getElementById('modeSci'); if (r1) r1.checked = (sndMode === 'movie'); if (r2) r2.checked = (sndMode === 'sci');
+    for (var k in sndCache){ if (!sndCache[k].loop){ try { sndCache[k].pause(); } catch (err) {} } }
+    var el = document.getElementById('sndCaption'); if (el){ el.textContent = '울음소리 종류: ' + (sndMode === 'sci' ? '학자들이 추정하는 소리' : '영화식 소리'); el.style.opacity = '1'; clearTimeout(capTimer); capTimer = setTimeout(function(){ el.style.opacity = '0'; }, 2500); }
+  }
   function playSound(act){
-    var f = SP.sounds && SP.sounds[act]; if (!f || !sndRoarOn) return;
+    var f = (act === 'roar') ? roarFile() : (SP.sounds && SP.sounds[act]);
+    if (act === 'roar') showCaption();
+    if (!f || !sndRoarOn) return;
     var a = getAudio(f, false, 0.85);
     try { a.currentTime = 0; } catch (err) {}
     var pr = a.play(); if (pr && pr.catch) pr.catch(function(){});
@@ -532,7 +558,7 @@
     sndRoarOn = roar; sndStepOn = step;
     var c1 = document.getElementById('chkRoar'), c2 = document.getElementById('chkStep');
     if (c1) c1.checked = roar; if (c2) c2.checked = step;
-    if (!roar){ var f = SP.sounds && SP.sounds.roar; if (f && sndCache[f]) { try { sndCache[f].pause(); } catch (err) {} } }
+    if (!roar){ for (var kk in sndCache){ if (!sndCache[kk].loop){ try { sndCache[kk].pause(); } catch (err) {} } } }
     if (!step) updateLoopSounds();
   }
   function baseView(v){ return String(v).replace(/^f_/, ''); }
@@ -588,12 +614,13 @@
     return k;
   }
   window.addEventListener('keydown', function(e){
-    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range' && e.target.type !== 'checkbox') return;
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range' && e.target.type !== 'checkbox' && e.target.type !== 'radio') return;
     var k = norm(e);
     if (k === 'Shift') shiftDown = true;
     if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].indexOf(k) >= 0 || k === ' ') e.preventDefault();
     if (k === 'm' && !e.repeat){ var allOn = sndRoarOn || sndStepOn; setSoundOpts(!allOn, !allOn); if (allOn) stopSounds(); return; }
     if (k === 'n' && !e.repeat){ setSoundOpts(sndRoarOn, !sndStepOn); return; }
+    if (k === 'b' && !e.repeat){ if (SP.soundsSci) setSoundMode(sndMode === 'sci' ? 'movie' : 'sci'); return; }
     if (k === 'f' && !e.repeat){ toggleFlight(); return; }
     if (k === 't' && !e.repeat && SP.onceTail){ if (REAR[st.view] && has(st.view, 'tail')) startOnce('tail'); return; }
     if (k === 'r' && !e.repeat){ startOnce('roar'); return; }
@@ -617,7 +644,7 @@
   });
   /* 마우스로 시점 돌리기 / 휠로 거리 */
   var drag = null;
-  stage.addEventListener('pointerdown', function(e){ if (e.target.closest && e.target.closest('button')) return; drag = { x:e.clientX, y:e.clientY }; try { stage.setPointerCapture(e.pointerId); } catch(_){} });
+  stage.addEventListener('pointerdown', function(e){ if (e.target.closest && e.target.closest('button, #sndPanel')) return; drag = { x:e.clientX, y:e.clientY }; try { stage.setPointerCapture(e.pointerId); } catch(_){} });
   stage.addEventListener('pointermove', function(e){
     if (!drag) return;
     cam.yaw += (e.clientX - drag.x) * 0.004;
