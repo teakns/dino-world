@@ -246,7 +246,7 @@
   </div>
 
   <p class="check"><b>살펴볼 점</b> 벽 네 장이 만나는 <b>모서리</b>가 눈에 띄는지(마우스로 시점을 한 바퀴 돌려 보세요), 하늘이 이어지는지, 바닥 무늬가 반복돼 보이는지, 공룡이 땅에 제대로 서 있는지, 공룡 크기가 풍경에 어울리는지, 멀리 갈수록 넓은 느낌이 나는지.</p>
-  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_steps.wav</b>, <b>ptero_wings.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 15개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
+  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_step_a/b/c.wav</b>, <b>ptero_wings.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 15개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
 </div>
 
 <script src="three.min.js"></script>
@@ -629,7 +629,7 @@
     var walking = (st.air === 0) && (act === 'walk' || act === 'rev');
     var flyAct = (act === 'flap' || act === 'takeoff' || act === 'land');
     var gr = (act === 'glide' && SP.glideRate) ? SP.glideRate[st.view] : 0;       // 옆모습 활강은 날개가 움직이는 영상이라 느리게 날갯짓 소리
-    loopSound(SP.steps, walking, rate, 0.55);
+    /* 걸음 소리는 stepTick()이 발이 닿는 순간마다 재생해요 */
     loopSound(SP.wings, flyAct || !!gr, gr ? gr : 1, 0.6);
   }
   function setSoundOpts(roar, step){
@@ -826,6 +826,62 @@
     window.addEventListener('keydown', function(e){ if (e.key === 'g' || e.key === 'G'){ if (!(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))) toggleFull(); } });
     window.__touchui = { enter: enterTouchUI };
   } catch (err) { if (window.console) console.warn('touch ui', err); }
+
+  /* ---------- 걸음 소리: 영상에서 발이 땅에 닿는 순간마다 '쿵' ---------- */
+  var STEPS = {"tri":{"side":{"walk":{"dur":3.583,"t":[0.042,0.927,1.854,2.802]},"rev":{"dur":3.583,"t":[0.385,1.036,1.746,2.46,3.194]}},"front":{"walk":{"dur":4.5,"t":[0.344,1.115,1.844,2.594,3.344,4.094]},"rev":{"dur":4.5,"t":[0.094,0.844,1.594,2.344,3.094,3.844]}},"f34":{"walk":{"dur":2.917,"t":[0.458,1.177,1.896,2.677]},"rev":{"dur":2.917,"t":[0.615,1.559,2.524]}},"back":{"walk":{"dur":4.625,"t":[0.312,1.094,1.854,2.594,3.375,4.156]},"rev":{"dur":4.625,"t":[0.136,0.916,1.677,2.437,3.198,3.979]}},"r34":{"walk":{"dur":2.833,"t":[0.0,0.729,1.417,2.146]},"rev":{"dur":2.833,"t":[0.5,1.187,1.875,2.646]}}},"trex":{"side":{"walk":{"dur":4.667,"t":[0.177,1.123,2.09,3.035,3.939]},"rev":{"dur":4.667,"t":[0.479,1.362,2.267,3.233,4.179]}},"front":{"walk":{"dur":3.5,"t":[0.094,0.969,1.823,2.677]},"rev":{"dur":3.5,"t":[0.312,1.167,2.021,2.937]}},"f34":{"walk":{"dur":3.25,"t":[0.167,0.969,1.729,2.531]},"rev":{"dur":3.25,"t":[0.437,1.198,2.062,2.844]}},"back":{"walk":{"dur":3.458,"t":[0.677,1.526,2.396,3.245]},"rev":{"dur":3.458,"t":[0.812,1.682,2.51,3.401]}},"r34":{"walk":{"dur":3.917,"t":[0.948,1.875,1.917,2.865]},"rev":{"dur":3.917,"t":[0.771,1.677,2.687,3.614]}}},"edmo":{"side":{"walk":{"dur":3.167,"t":[0.271,1.319,2.41]},"rev":{"dur":3.167,"t":[0.073,1.143,2.191]}},"front":{"walk":{"dur":3.583,"t":[0.667,1.615,2.479,3.386]},"rev":{"dur":3.583,"t":[0.656,1.562,2.427,3.438]}},"f34":{"walk":{"dur":3.167,"t":[0.292,1.104,1.896,2.667]},"rev":{"dur":3.167,"t":[0.729,1.562,1.583,2.333]}},"back":{"walk":{"dur":4.917,"t":[0.198,1.045,1.851,2.677,3.462,4.309]},"rev":{"dur":4.917,"t":[0.229,1.076,1.84,2.687,3.493,4.34]}},"r34":{"walk":{"dur":4.083,"t":[0.125,0.971,1.775,2.6,3.425]},"rev":{"dur":4.083,"t":[0.229,1.096,1.754,2.683,3.475]}}},"ptero":{"side":{"walk":{"dur":4.833,"t":[0.656,1.517,2.253,3.031,3.872,4.691]},"rev":{"dur":4.833,"t":[0.615,1.434,2.233,2.989,3.809,4.712]}},"front":{"walk":{"dur":3.792,"t":[0.115,0.722,1.351,1.958,2.608,3.257]},"rev":{"dur":3.792,"t":[0.25,0.878,1.528,2.177,2.805,3.413]}},"f34":{"walk":{"dur":4.167,"t":[0.687,1.41,2.069,2.09,2.708,3.451]},"rev":{"dur":4.167,"t":[0.396,1.035,1.778,2.417,3.18,3.778]}},"back":{"walk":{"dur":4.583,"t":[0.552,1.11,1.646,2.203,2.245,2.76,3.338,3.917]},"rev":{"dur":4.583,"t":[0.125,0.634,1.113,1.66,2.185,2.711,3.194,3.741,4.183]}},"r34":{"walk":{"dur":3.958,"t":[0.479,1.312,2.104,2.834,3.687]},"rev":{"dur":3.958,"t":[0.604,1.458,2.354,3.083,3.875]}}}};
+  var STEPFILES = { tri:['tri_step_a.wav', 'tri_step_b.wav', 'tri_step_c.wav'], trex:['trex_step_a.wav', 'trex_step_b.wav', 'trex_step_c.wav'], edmo:['edmo_step_a.wav', 'edmo_step_b.wav'], ptero:['ptero_step_a.wav', 'ptero_step_b.wav'] };
+  var STEPVOL = { tri:0.62, trex:0.72, edmo:0.62, ptero:0.5 };
+  var stepAC = null, stepBuf = {}, stepFail = false, stepPool = {}, stepLastVar = -1, stepLast = { key:null, t:0 }, stepReal = 0;
+  function stepCtx(){
+    var files = STEPFILES[SP_ID]; if (!files || stepAC || stepFail) return;
+    try { var AC = window.AudioContext || window.webkitAudioContext; if (!AC){ stepFail = true; } else stepAC = new AC(); } catch (err) { stepFail = true; }
+    files.forEach(function(f){                                            // 예비: 일반 오디오 (파일을 직접 열 때처럼 WebAudio가 안 될 때)
+      var pool = stepPool[f] = { a:[], n:0 };
+      for (var i = 0; i < 3; i++){ var au = new Audio(f); au.preload = 'auto'; pool.a.push(au); }
+      if (!stepAC) return;
+      try {
+        fetch(f).then(function(r){ if (!r.ok) throw new Error('x'); return r.arrayBuffer(); })
+          .then(function(b){ return new Promise(function(res, rej){ stepAC.decodeAudioData(b, res, rej); }); })
+          .then(function(buf){ stepBuf[f] = buf; }).catch(function(){ stepBuf[f] = null; });
+      } catch (err) { stepBuf[f] = null; }
+    });
+  }
+  function stepResume(){ stepCtx(); if (stepAC && stepAC.state === 'suspended'){ try { stepAC.resume(); } catch (err) {} } }
+  window.addEventListener('pointerdown', stepResume, true); window.addEventListener('keydown', stepResume, true);
+  function stepLog(info){ if (window.__steplog) window.__steplog.push(info); }
+  function playStep(){
+    var files = STEPFILES[SP_ID]; if (!files) return null;
+    var i = Math.floor(Math.random() * files.length); if (i === stepLastVar) i = (i + 1) % files.length; stepLastVar = i;
+    var f = files[i], vol = (STEPVOL[SP_ID] || 0.6) * (0.88 + Math.random() * 0.24), pitch = 0.96 + Math.random() * 0.08;
+    if (stepAC && stepAC.state === 'running' && stepBuf[f]){
+      var src = stepAC.createBufferSource(), g = stepAC.createGain(); src.buffer = stepBuf[f]; src.playbackRate.value = pitch; g.gain.value = vol; src.connect(g); g.connect(stepAC.destination); src.start();
+      return 'webaudio';
+    }
+    var pool = stepPool[f]; if (!pool) return null;
+    var a = pool.a[pool.n++ % pool.a.length]; try { a.currentTime = 0; } catch (err) {} a.volume = Math.min(1, vol); try { a.playbackRate = pitch; } catch (err) {}
+    var pr = a.play(); if (pr && pr.catch) pr.catch(function(){});
+    return 'audio';
+  }
+  function stepTick(){
+    if (!sndStepOn || !SP.steps || !STEPS[SP_ID] || st.air !== 0){ stepLast.key = null; return; }
+    var parts = (st.key || '').split(':'), view = parts[0], act = parts[1];
+    if (act !== 'walk' && act !== 'rev'){ stepLast.key = null; return; }
+    var tv = STEPS[SP_ID][view], tab = tv && tv[act], v = vids[st.key];
+    if (!tab || !v || v.paused || v.readyState < 2){ stepLast.key = null; return; }
+    var ct = v.currentTime, rate = v.playbackRate || 1, dur = tab.dur, pt = stepLast.t;
+    if (stepLast.key !== st.key){ stepLast.key = st.key; stepLast.t = ct; stepResume(); return; }
+    stepLast.t = ct;
+    var lead = ((stepAC && stepAC.state === 'running' && stepBuf[(STEPFILES[SP_ID] || [])[0]]) ? 0.03 : 0.07) * rate;    // 소리가 늦게 나는 만큼 미리 재생
+    var a = pt + lead, b = ct + lead; if (ct < pt - 0.3) b += dur;                                                     // 영상이 처음으로 되돌아간 경우
+    var now = performance.now();
+    for (var i = 0; i < tab.t.length; i++){
+      var e = tab.t[i];
+      if ((e > a && e <= b) || (e + dur > a && e + dur <= b)){
+        if (now - stepReal < 110 / Math.max(0.6, rate)) continue;                                                      // 너무 붙은 소리는 건너뜀
+        stepReal = now; var how = playStep(); stepLog({ key:st.key, e:e, ct:ct, rate:rate, how:how });
+      }
+    }
+  }
 
   /* ---------- 풍경(시간·날씨)과 배경 동물 ---------- */
   var AMB = { on:true, list:[], started:false };
@@ -1055,6 +1111,7 @@
       dino.style.width = sw + 'px'; dino.style.height = sh + 'px';
       dino.style.transform = 'translate(' + (f0.x - sw / 2) + 'px,' + (f0.y - sh * FOOT_REF) + 'px) scaleX(' + flip + ')';
       try { envFrame(dt, W, H, fx, fz, rx, rz); } catch (err) { if (window.console && !window.__envErr){ window.__envErr = 1; console.warn('env', err); } }
+      try { stepTick(); } catch (err) { if (window.console && !window.__stepErr){ window.__stepErr = 1; console.warn('steps', err); } }
 
       // 그림자: 몸이 향한 월드 방향으로 길쭉하게
       var hc = Math.cos(st.hd), hs = Math.sin(st.hd);
