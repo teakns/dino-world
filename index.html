@@ -169,6 +169,31 @@
   #envPanel .chip.on{background:#D9962B; color:#1B2B26; border-color:#fff}
   #envPanel label{display:flex; gap:6px; align-items:center; cursor:pointer}
   #bEnvHdr{font-size:.85rem; padding:4px 10px}
+
+  /* ---------- 스마트폰·태블릿: 꽉 찬 화면 안의 메뉴 창 ---------- */
+  #stage{touch-action:none}
+  body.full{touch-action:none}
+  #tpBackdrop{display:none; position:absolute; inset:0; z-index:11; background:rgba(0,0,0,.4)}
+  #tpBackdrop.show{display:block}
+  #tui{z-index:12}
+  #tpanels .tpanel{display:none; position:absolute; z-index:13; left:50%; top:58px; transform:translateX(-50%); width:min(620px, calc(100% - 24px)); max-height:calc(100% - 70px); overflow:auto;
+                   background:rgba(28,40,36,.96); color:#fff; border-radius:16px; padding:12px 16px 16px; font-size:.95rem; touch-action:pan-y; -webkit-overflow-scrolling:touch}
+  #tpanels .tpanel.show{display:block}
+  .tphead{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:1.05rem}
+  .tpclose{background:rgba(255,255,255,.16); color:#fff; border:1px solid rgba(255,255,255,.4); border-radius:50%; width:40px; height:40px; font-size:1.05rem; padding:0}
+  .spgrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px}
+  .spgrid button{padding:16px 10px; font-size:1rem; border-radius:12px; background:rgba(255,255,255,.14); color:#fff; border:1px solid rgba(255,255,255,.4)}
+  .spgrid button.on{background:#D9962B; color:#1B2B26; border-color:#fff}
+  #tpanels .card{background:transparent; border:0; padding:0; color:#fff}
+  #tpanels .card h2{display:none}
+  #tpanels .ctl{grid-template-columns:7.2em 1fr 2.8em; gap:12px 10px; font-size:.95rem}
+  #tpanels .ctl output{color:#CFE0D6}
+  #tpanels input[type=range]{height:30px}
+  #tpanels .opts{font-size:.98rem; gap:10px 18px}
+  #tpanels ul{margin:0; padding-left:1.2em; line-height:1.6}
+  #tpanels li{margin-bottom:8px}
+  .touchui #envPanel, .touchui.snd-open #sndPanel{z-index:13; position:absolute; left:50%; top:58px; right:auto; bottom:auto; transform:translateX(-50%); width:min(480px, calc(100% - 24px)); max-width:none; max-height:calc(100% - 70px); overflow:auto}
+  @media (orientation:portrait){ .touchui #ttop{gap:6px} .touchui #ttop .tbtn{width:40px; height:40px; font-size:1.1rem} .touchui #hud{top:58px} }
 </style>
 </head>
 <body>
@@ -246,7 +271,7 @@
   </div>
 
   <p class="check"><b>살펴볼 점</b> 벽 네 장이 만나는 <b>모서리</b>가 눈에 띄는지(마우스로 시점을 한 바퀴 돌려 보세요), 하늘이 이어지는지, 바닥 무늬가 반복돼 보이는지, 공룡이 땅에 제대로 서 있는지, 공룡 크기가 풍경에 어울리는지, 멀리 갈수록 넓은 느낌이 나는지.</p>
-  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_step_a/b/c.wav</b>, <b>ptero_wings.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 15개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
+  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_step_a/b/c.wav</b>, <b>ptero_wing_a/b.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 15개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
 </div>
 
 <script src="three.min.js"></script>
@@ -630,7 +655,7 @@
     var flyAct = (act === 'flap' || act === 'takeoff' || act === 'land');
     var gr = (act === 'glide' && SP.glideRate) ? SP.glideRate[st.view] : 0;       // 옆모습 활강은 날개가 움직이는 영상이라 느리게 날갯짓 소리
     /* 걸음 소리는 stepTick()이 발이 닿는 순간마다 재생해요 */
-    loopSound(SP.wings, flyAct || !!gr, gr ? gr : 1, 0.6);
+    /* 날갯짓 소리는 wingTick()이 날개가 내려치는 순간마다 재생해요 */
   }
   function setSoundOpts(roar, step){
     sndRoarOn = roar; sndStepOn = step;
@@ -721,15 +746,29 @@
     ['pointerup','pointerleave','pointercancel'].forEach(function(t){ b.addEventListener(t, off); });
   });
   /* 마우스로 시점 돌리기 / 휠로 거리 */
-  var drag = null;
-  stage.addEventListener('pointerdown', function(e){ if (e.target.closest && e.target.closest('button, #sndPanel, #tpad, #envPanel')) return; drag = { x:e.clientX, y:e.clientY }; try { stage.setPointerCapture(e.pointerId); } catch(_){} });
+  var drag = null, ptrs = {}, pinch = null;
+  function setCamDist(d){ cam.dist = Math.max(6, Math.min(40, d)); opt.camd = cam.dist; $('#sCamD').value = cam.dist; $('#oCamD').textContent = Math.round(cam.dist); }
+  function twoPtrs(){ var k = Object.keys(ptrs); return k.length >= 2 ? [ptrs[k[0]], ptrs[k[1]]] : null; }
+  stage.addEventListener('pointerdown', function(e){
+    if (e.target.closest && e.target.closest('button, #sndPanel, #tpad, #envPanel, .tpanel, #tpBackdrop')) return;
+    ptrs[e.pointerId] = { x:e.clientX, y:e.clientY }; try { stage.setPointerCapture(e.pointerId); } catch(_){}
+    var n = Object.keys(ptrs).length;
+    if (n === 1) drag = { x:e.clientX, y:e.clientY };
+    else if (n === 2){ var p = twoPtrs(); drag = null; pinch = { d0: Math.max(10, Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y)), c0: cam.dist }; }
+  });
   stage.addEventListener('pointermove', function(e){
+    if (ptrs[e.pointerId]){ ptrs[e.pointerId].x = e.clientX; ptrs[e.pointerId].y = e.clientY; }
+    if (pinch){ var p = twoPtrs(); if (p) setCamDist(pinch.c0 * pinch.d0 / Math.max(10, Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y))); return; }   // 두 손가락: 벌리면 가까이, 모으면 멀리
     if (!drag) return;
     cam.yaw += (e.clientX - drag.x) * 0.004;
     cam.pitch = Math.max(-20, Math.min(50, cam.pitch + (e.clientY - drag.y) * 0.15));
     drag.x = e.clientX; drag.y = e.clientY;
   });
-  ['pointerup', 'pointercancel'].forEach(function(t){ stage.addEventListener(t, function(){ drag = null; }); });
+  ['pointerup', 'pointercancel'].forEach(function(t){ stage.addEventListener(t, function(e){
+    delete ptrs[e.pointerId]; var k = Object.keys(ptrs), n = k.length;
+    if (n < 2) pinch = null;
+    if (n === 1) drag = { x:ptrs[k[0]].x, y:ptrs[k[0]].y }; else if (n === 0) drag = null;
+  }); });
   stage.addEventListener('wheel', function(e){
     e.preventDefault();
     cam.dist = Math.max(6, Math.min(40, cam.dist * (1 + (e.deltaY > 0 ? 0.08 : -0.08))));
@@ -742,9 +781,11 @@
   try {
     var bodyEl = document.body, tuiEl = document.getElementById('tui'), toastEl = document.getElementById('tToast'), toastT = null, hinted = false;
     function toast(msg, ms){ toastEl.textContent = msg; toastEl.style.opacity = '1'; clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.style.opacity = '0'; }, ms || 3500); }
+    var touchLocked = false, layoutReady = false;
     function enterTouchUI(){
-      bodyEl.classList.add('touchui');
-      if (!hinted){ hinted = true; setTimeout(function(){ toast('오른쪽 위 ⛶ 버튼을 누르면 화면 가득 크게 볼 수 있어요', 5000); }, 1200); }
+      bodyEl.classList.add('touchui'); touchLocked = true;
+      if (layoutReady) applyTouchLayout();
+      if (!hinted){ hinted = true; setTimeout(function(){ toast(window.innerHeight > window.innerWidth ? '가로로 돌리면 더 넓게 볼 수 있어요' : '오른쪽 위 아이콘으로 공룡·풍경·소리·조절을 바꿀 수 있어요', 5000); }, 1500); }
     }
     if ((window.matchMedia && matchMedia('(pointer:coarse)').matches) || /[?&]touch=1/.test(location.search)) enterTouchUI();
     window.addEventListener('touchstart', enterTouchUI, { once:true, passive:true });
@@ -790,7 +831,7 @@
     /* 위쪽 버튼: 시점 되돌리기, 소리 설정, 전체 화면 */
     var bSndEl = document.getElementById('bSnd');
     if (!SP.sounds) bSndEl.style.display = 'none';
-    bSndEl.addEventListener('pointerdown', function(e){ e.preventDefault(); bodyEl.classList.toggle('snd-open'); });
+    bSndEl.addEventListener('pointerdown', function(e){ e.preventDefault(); openPanel('snd'); });
     document.getElementById('bView').addEventListener('pointerdown', function(e){ e.preventDefault(); cam.yaw = 0; cam.pitch = 4; });
 
     /* 전체 화면: 브라우저가 허락하면 진짜 전체 화면, 아니면(아이폰 등) 화면 가득 채우는 방식 */
@@ -798,6 +839,7 @@
     function getWake(){ try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function(l){ wakeLock = l; }).catch(function(){}); } catch (err) {} }
     function releaseWake(){ try { if (wakeLock){ wakeLock.release(); wakeLock = null; } } catch (err) {} }
     function setFullUI(on){
+      if (touchLocked){ bodyEl.classList.add('full'); bFullEl.textContent = on ? '🗗' : '⛶'; return; }       // 스마트폰·태블릿은 늘 꽉 찬 화면, 이 버튼은 주소창까지 숨기는 전체 화면
       bodyEl.classList.toggle('full', on); bFullEl.textContent = on ? '✕' : '⛶'; bFullHdr.textContent = on ? '✕ 전체 화면 끄기' : '⛶ 전체 화면';
       if (on && window.innerHeight > window.innerWidth) toast('가로로 돌리면 더 넓게 볼 수 있어요', 4500);
     }
@@ -805,7 +847,7 @@
     function enterFull(){
       var el = document.documentElement, rq = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
       setFullUI(true); getWake();
-      if (!rq){ pseudoFull = true; return; }
+      if (!rq){ pseudoFull = true; if (touchLocked){ setFullUI(false); toast('이 기기는 브라우저 전체 화면을 지원하지 않아요. 공유 버튼 → 홈 화면에 추가로 열면 주소창 없이 보여요.', 6500); } return; }
       try {
         var pr = rq.call(el, { navigationUI: 'hide' });
         var lock = function(){ try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function(){}); } catch (err) {} };
@@ -817,13 +859,62 @@
       if (isRealFull()){ try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (err) {} }
       try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (err) {}
     }
-    function toggleFull(){ if (bodyEl.classList.contains('full')) exitFull(); else enterFull(); }
+    function toggleFull(){ if (touchLocked){ if (isRealFull()) exitFull(); else enterFull(); return; } if (bodyEl.classList.contains('full')) exitFull(); else enterFull(); }
     document.addEventListener('fullscreenchange', function(){ if (!isRealFull() && bodyEl.classList.contains('full') && !pseudoFull) exitFull(); });
     document.addEventListener('webkitfullscreenchange', function(){ if (!isRealFull() && bodyEl.classList.contains('full') && !pseudoFull) exitFull(); });
     document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible' && bodyEl.classList.contains('full')) getWake(); });
     bFullEl.addEventListener('pointerdown', function(e){ e.preventDefault(); toggleFull(); });
     bFullHdr.addEventListener('click', toggleFull);
     window.addEventListener('keydown', function(e){ if (e.key === 'g' || e.key === 'G'){ if (!(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))) toggleFull(); } });
+    /* 스마트폰·태블릿: 모든 메뉴를 꽉 찬 화면 안의 아이콘과 창으로 */
+    var panelOpen = null, panelsBuilt = false, tpanels = null, backdrop = null;
+    function closePanels(){
+      bodyEl.classList.remove('env-open', 'snd-open'); panelOpen = null;
+      if (tpanels) Array.prototype.forEach.call(tpanels.children, function(p){ p.classList.remove('show'); });
+      if (backdrop) backdrop.classList.remove('show');
+    }
+    function openPanel(name){
+      var same = (panelOpen === name); closePanels(); if (same) return;
+      panelOpen = name; if (backdrop) backdrop.classList.add('show');
+      if (name === 'env') bodyEl.classList.add('env-open'); else if (name === 'snd') bodyEl.classList.add('snd-open');
+      else { var p = document.getElementById('pn-' + name); if (p) p.classList.add('show'); }
+    }
+    function buildTouchPanels(){
+      if (panelsBuilt) return; panelsBuilt = true;
+      backdrop = document.createElement('div'); backdrop.id = 'tpBackdrop'; stage.appendChild(backdrop);
+      backdrop.addEventListener('pointerdown', function(e){ e.preventDefault(); closePanels(); });
+      tpanels = document.createElement('div'); tpanels.id = 'tpanels'; stage.appendChild(tpanels);
+      function mkPanel(name, title){
+        var p = document.createElement('div'); p.className = 'tpanel'; p.id = 'pn-' + name;
+        p.innerHTML = '<div class="tphead"><b>' + title + '</b><button type="button" class="tpclose" aria-label="닫기">✕</button></div><div class="tpbody"></div>';
+        p.querySelector('.tpclose').addEventListener('click', closePanels); tpanels.appendChild(p); return p.querySelector('.tpbody');
+      }
+      var sel = document.getElementById('selSp'), cur = sel ? sel.value : '', grid = document.createElement('div'); grid.className = 'spgrid';
+      Array.prototype.forEach.call(sel ? sel.options : [], function(o){
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = o.textContent; if (o.value === cur) b.className = 'on';
+        b.addEventListener('click', function(){ if (o.value === cur){ closePanels(); return; } var q = new URLSearchParams(location.search); q.set('sp', o.value); location.search = q.toString(); });
+        grid.appendChild(b);
+      });
+      mkPanel('sp', '🦖 공룡 바꾸기').appendChild(grid);
+      mkPanel('help', '❓ 조종 방법').innerHTML = '<ul>' +
+        '<li><b>왼쪽 아래 방향 패드</b>를 누르고 끌면 그쪽으로 걸어요. 대각선으로도 갈 수 있어요.</li>' +
+        '<li><b>오른쪽 아래 버튼</b>: 울음, 먹기·뒷걸음(누르는 동안), 빠르게(켜고 끄기) 등이에요. 공룡마다 나오는 버튼이 달라요.</li>' +
+        (SP.flight ? '<li><b>🕊 이륙</b> 버튼으로 하늘로 날아올라요. 날면서 <b>빠르게</b>를 켜면 활강하고, <b>착륙</b>을 누르면 내려와요.</li>' : '') +
+        (SP.flight ? '<li><b>🪽 날개 펴기</b>는 뒤쪽을 보고 있을 때 한 번 움직여요.</li>' : '<li><b>👀 돌아보기, 🌀 꼬리</b>는 공룡이 <b>뒤쪽</b>을 향할 때만 움직여요.</li>') +
+        '<li>화면을 <b>한 손가락으로 끌면</b> 시점이 돌아가요.</li>' +
+        '<li><b>두 손가락을 벌리면 가까이, 모으면 멀리</b> 보여요.</li>' +
+        '<li>위쪽 아이콘: 🦖 공룡 바꾸기 · ❓ 조종 방법 · ⚙ 조절 · 🎯 시점 처음으로 · 🌤 풍경 · 🔊 소리 · ⛶ 브라우저 전체 화면(주소창 숨기기)</li>' +
+        '<li>가로로 돌려서 보면 더 넓게 보여요.</li></ul>';
+      var ctlCard = document.querySelectorAll('.grid .card')[1], bc = mkPanel('ctl', '⚙ 조절'); if (ctlCard) bc.appendChild(ctlCard);      // 컴퓨터의 '조절' 카드를 그대로 옮겨요 (슬라이더 동작 유지)
+      var top = document.getElementById('ttop'), first = top.firstChild;
+      [['bSp', '🦖', '공룡 바꾸기', 'sp'], ['bHelp', '❓', '조종 방법', 'help'], ['bCtl', '⚙', '조절', 'ctl']].forEach(function(d){
+        var b = document.createElement('button'); b.id = d[0]; b.className = 'tbtn'; b.type = 'button'; b.setAttribute('aria-label', d[2]); b.textContent = d[1];
+        b.addEventListener('pointerdown', function(e){ e.preventDefault(); openPanel(d[3]); }); top.insertBefore(b, first);
+      });
+    }
+    function applyTouchLayout(){ buildTouchPanels(); bodyEl.classList.add('full'); }
+    window.__openPanel = openPanel;
+    layoutReady = true; if (touchLocked) applyTouchLayout();
     window.__touchui = { enter: enterTouchUI };
   } catch (err) { if (window.console) console.warn('touch ui', err); }
 
@@ -833,7 +924,7 @@
   var STEPVOL = { tri:0.62, trex:0.72, edmo:0.62, ptero:0.5 };
   var stepAC = null, stepBuf = {}, stepFail = false, stepPool = {}, stepLastVar = -1, stepLast = { key:null, t:0 }, stepReal = 0;
   function stepCtx(){
-    var files = STEPFILES[SP_ID]; if (!files || stepAC || stepFail) return;
+    var files = (STEPFILES[SP_ID] || []).concat(SP.wings ? WINGFILES : []); if (!files.length || stepAC || stepFail) return;
     try { var AC = window.AudioContext || window.webkitAudioContext; if (!AC){ stepFail = true; } else stepAC = new AC(); } catch (err) { stepFail = true; }
     files.forEach(function(f){                                            // 예비: 일반 오디오 (파일을 직접 열 때처럼 WebAudio가 안 될 때)
       var pool = stepPool[f] = { a:[], n:0 };
@@ -849,10 +940,7 @@
   function stepResume(){ stepCtx(); if (stepAC && stepAC.state === 'suspended'){ try { stepAC.resume(); } catch (err) {} } }
   window.addEventListener('pointerdown', stepResume, true); window.addEventListener('keydown', stepResume, true);
   function stepLog(info){ if (window.__steplog) window.__steplog.push(info); }
-  function playStep(){
-    var files = STEPFILES[SP_ID]; if (!files) return null;
-    var i = Math.floor(Math.random() * files.length); if (i === stepLastVar) i = (i + 1) % files.length; stepLastVar = i;
-    var f = files[i], vol = (STEPVOL[SP_ID] || 0.6) * (0.88 + Math.random() * 0.24), pitch = 0.96 + Math.random() * 0.08;
+  function playSample(f, vol, pitch){
     if (stepAC && stepAC.state === 'running' && stepBuf[f]){
       var src = stepAC.createBufferSource(), g = stepAC.createGain(); src.buffer = stepBuf[f]; src.playbackRate.value = pitch; g.gain.value = vol; src.connect(g); g.connect(stepAC.destination); src.start();
       return 'webaudio';
@@ -861,6 +949,11 @@
     var a = pool.a[pool.n++ % pool.a.length]; try { a.currentTime = 0; } catch (err) {} a.volume = Math.min(1, vol); try { a.playbackRate = pitch; } catch (err) {}
     var pr = a.play(); if (pr && pr.catch) pr.catch(function(){});
     return 'audio';
+  }
+  function playStep(){
+    var files = STEPFILES[SP_ID]; if (!files) return null;
+    var i = Math.floor(Math.random() * files.length); if (i === stepLastVar) i = (i + 1) % files.length; stepLastVar = i;
+    return playSample(files[i], (STEPVOL[SP_ID] || 0.6) * (0.88 + Math.random() * 0.24), 0.96 + Math.random() * 0.08);
   }
   function stepTick(){
     if (!sndStepOn || !SP.steps || !STEPS[SP_ID] || st.air !== 0){ stepLast.key = null; return; }
@@ -879,6 +972,32 @@
       if ((e > a && e <= b) || (e + dur > a && e + dur <= b)){
         if (now - stepReal < 110 / Math.max(0.6, rate)) continue;                                                      // 너무 붙은 소리는 건너뜀
         stepReal = now; var how = playStep(); stepLog({ key:st.key, e:e, ct:ct, rate:rate, how:how });
+      }
+    }
+  }
+
+  /* ---------- 날갯짓 소리: 날개가 내려치는 순간마다 (날갯짓·활강·이륙·착륙 영상 모두) ---------- */
+  var WINGS = {"f_side":{"flap":{"dur":4.917,"amp":96,"t":[1.217,2.383,3.592,4.875]},"glide":{"dur":10.917,"amp":86,"t":[0.175,1.3,2.467,3.508,4.675,6.342,7.508,8.55,9.717]},"takeoff":{"dur":3.208,"amp":121,"t":[1.717,2.592]},"land":{"dur":3.5,"amp":109,"t":[0.3,1.3]}},"f_front":{"flap":{"dur":4.958,"amp":30,"t":[0.133,0.633,1.133,1.633,2.258,2.883,3.467,4.05,4.508]},"glide":{"dur":10.083,"amp":28,"t":[0.758,1.967,3.258,4.717,5.467,6.925,8.175,9.383]},"takeoff":{"dur":3.458,"amp":87,"t":[2.633]},"land":{"dur":4.5,"amp":56,"t":[1.175]}},"f_f34":{"flap":{"dur":4.958,"amp":96,"t":[0.05,1.05,2.008,3.008,4.008]},"glide":{"dur":11.667,"amp":82,"t":[0.175,1.758,3.3,4.467,5.883,7.3,8.467,9.967]},"takeoff":{"dur":4.042,"amp":86,"t":[1.8,2.592,3.383]},"land":{"dur":3.875,"amp":98,"t":[0.55,1.383]}},"f_back":{"flap":{"dur":2.708,"amp":46,"t":[1.342,2.667]},"glide":{"dur":11.333,"amp":22,"t":[0.05,1.675,3.008,4.342,5.717,7.092,8.425,9.758]},"takeoff":{"dur":3.833,"amp":105,"t":[2.092]},"land":{"dur":4.625,"amp":78,"t":[1.425]}},"f_r34":{"flap":{"dur":3.833,"amp":58,"t":[0.175,1.383,2.675]},"glide":{"dur":11.417,"amp":16,"t":[0.758,2.55,4.258,5.758,7.217,8.925,10.758]},"takeoff":{"dur":4.958,"amp":101,"t":[1.758,2.8,4.175]},"land":{"dur":5.0,"amp":49,"t":[0.592]}}}, WINGFILES = ['ptero_wing_a.wav', 'ptero_wing_b.wav'], wingLast = { key:null, t:0 }, wingReal = 0, wingVar = -1;
+  function playWing(amp){
+    var i = Math.floor(Math.random() * WINGFILES.length); if (i === wingVar) i = (i + 1) % WINGFILES.length; wingVar = i;
+    var k = Math.max(0.45, Math.min(1, 0.4 + amp / 150));                                   // 날개를 크게 저을수록 큰 소리, 낮은 소리
+    return playSample(WINGFILES[i], 0.62 * k * (0.9 + Math.random() * 0.2), (1.05 - 0.16 * Math.min(1, amp / 120)) * (0.97 + Math.random() * 0.06));
+  }
+  function wingTick(){
+    if (!sndStepOn || !SP.wings){ wingLast.key = null; return; }
+    var parts = (st.key || '').split(':'), view = parts[0], act = parts[1], tv = WINGS[view], tab = tv && tv[act], v = vids[st.key];
+    if (!tab || !v || v.paused || v.readyState < 2){ wingLast.key = null; return; }
+    var ct = v.currentTime, rate = v.playbackRate || 1, dur = tab.dur, pt = wingLast.t, once = (act === 'takeoff' || act === 'land');
+    if (wingLast.key !== st.key){ wingLast.key = st.key; wingLast.t = ct; stepResume(); return; }
+    wingLast.t = ct;
+    var lead = ((stepAC && stepAC.state === 'running' && stepBuf[WINGFILES[0]]) ? 0.03 : 0.07) * rate, a = pt + lead, b = ct + lead;
+    if (!once && ct < pt - 0.3) b += dur;
+    var now = performance.now();
+    for (var i = 0; i < tab.t.length; i++){
+      var e = tab.t[i];
+      if ((e > a && e <= b) || (!once && e + dur > a && e + dur <= b)){
+        if (now - wingReal < 140 / Math.max(0.5, rate)) continue;
+        wingReal = now; var how = playWing(tab.amp); stepLog({ key:st.key, e:e, ct:ct, rate:rate, how:how, wing:true });
       }
     }
   }
@@ -913,7 +1032,7 @@
   Array.prototype.forEach.call(envPanel.querySelectorAll('.chip'), function(c){ c.addEventListener('click', function(){ setEnv(c.getAttribute('data-env')); }); });
   var chkAmb = envPanel.querySelector('#chkAmb'); chkAmb.checked = AMB.on;
   chkAmb.addEventListener('change', function(){ AMB.on = chkAmb.checked; try { localStorage.setItem('dinoAmb', AMB.on ? '1' : '0'); } catch (err) {} chkAmb.blur(); });
-  function toggleEnvPanel(){ document.body.classList.toggle('env-open'); }
+  function toggleEnvPanel(){ if (window.__openPanel) window.__openPanel('env'); else document.body.classList.toggle('env-open'); }
   document.getElementById('bEnvHdr').addEventListener('click', toggleEnvPanel);
   var bEnvEl = document.getElementById('bEnv'); if (bEnvEl) bEnvEl.addEventListener('pointerdown', function(e){ e.preventDefault(); toggleEnvPanel(); });
   window.addEventListener('keydown', function(e){ if ((e.key === 'c' || e.key === 'C') && !(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))) cycleEnv(); });
@@ -1112,6 +1231,7 @@
       dino.style.transform = 'translate(' + (f0.x - sw / 2) + 'px,' + (f0.y - sh * FOOT_REF) + 'px) scaleX(' + flip + ')';
       try { envFrame(dt, W, H, fx, fz, rx, rz); } catch (err) { if (window.console && !window.__envErr){ window.__envErr = 1; console.warn('env', err); } }
       try { stepTick(); } catch (err) { if (window.console && !window.__stepErr){ window.__stepErr = 1; console.warn('steps', err); } }
+      try { wingTick(); } catch (err) { if (window.console && !window.__wingErr){ window.__wingErr = 1; console.warn('wings', err); } }
 
       // 그림자: 몸이 향한 월드 방향으로 길쭉하게
       var hc = Math.cos(st.hd), hs = Math.sin(st.hd);
