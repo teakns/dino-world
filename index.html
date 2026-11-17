@@ -295,12 +295,13 @@
             once:['roar','look','tail','takeoff','land'], onceTail:true,
             FOOT:{"side": 0.882, "f_side": 0.846, "front": 0.882, "f_front": 0.882, "f34": 0.882, "f_f34": 0.834, "back": 0.882, "f_back": 0.882, "r34": 0.876, "f_r34": 0.828}, SCALE:{"side": 1.223, "f_side": 1.229, "front": 0.985, "f_front": 0.993, "f34": 1.0, "f_f34": 1.183, "back": 1.0, "f_back": 1.016, "r34": 0.992, "f_r34": 1.194}, GAIT:{"side": {"p": 0.792, "t0": 0.875}, "front": {"p": 1.208, "t0": 1.458}, "f34": {"p": 1.375, "t0": 0.792}, "back": {"p": 1.083, "t0": 1.333}, "r34": {"p": 0.792, "t0": 0.708}} },
     truck:{ name:'탐사 사파리 차량', hd:2.9, refH:299, shadow:[3.0,1.4], speed:1.9, once:[],
-            FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879}, SCALE:{side:1,front:1,back:1,f34:1,r34:1},
-            GAIT:{side:{p:1,t0:0},front:{p:1,t0:0},back:{p:1,t0:0},f34:{p:1,t0:0},r34:{p:1,t0:0}} },
+            FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879, "v60": 0.88, "v120": 0.882, "v150": 0.882}, SCALE:{side:1,front:1,back:1,f34:1,r34:1,v60:1,v120:1,v150:1},
+            GAIT:{side:{p:1.417,t0:0},front:{p:2.25,t0:0},back:{p:1.875,t0:0},f34:{p:1.125,t0:0},r34:{p:1.125,t0:0},v60:{p:1.167,t0:0},v120:{p:1.167,t0:0},v150:{p:1.167,t0:0}},
+            spin:{side:1,f34:1,r34:1,front:1.4,back:1.4,v60:1,v120:1,v150:1}, spinShift:1.12, bands12:true },
     edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, soundsSci:{ roar:'roar_edmo_sci.mp3' }, capSci:"학자 추정: 새와 악어의 친척이라 오리처럼 낮게 꽥꽥거렸을 수 있다는 의견이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
             FOOT:{"side": 0.882, "front": 0.882, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.15, "front": 1.0, "f34": 1.02, "back": 0.949, "r34": 0.963}, GAIT:{"side": {"p": 1.042, "t0": 0.625}, "front": {"p": 0.875, "t0": 0.917}, "f34": {"p": 0.792, "t0": 0.583}, "back": {"p": 0.792, "t0": 1.25}, "r34": {"p": 0.792, "t0": 1.208}} },
-    anky:{ name:'안킬로사우루스', sounds:{ roar:'roar_anky.mp3' }, soundsSci:{ roar:'roar_anky_sci.mp3' }, capSci:"학자 추정: 안킬로사우루스류의 후두를 분석한 연구에서 새처럼 크고 터지는 듯한 소리를 냈을 가능성이 제안됐어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", hd:1.8, refH:193, shadow:[3.3,1.6], speed:0.8,
-            FOOT:{"side": 0.882, "front": 0.876}, SCALE:{"side": 1.135, "front": 0.894}, GAIT:{"side": {"p": 1.333, "t0": 1.167}, "front": {"p": 1.0, "t0": 1.458}} }
+    anky:{ name:'안킬로사우루스', sounds:{ roar:'roar_anky.mp3' }, soundsSci:{ roar:'roar_anky_sci.mp3' }, capSci:"학자 추정: 안킬로사우루스류의 후두를 분석한 연구에서 새처럼 크고 터지는 듯한 소리를 냈을 가능성이 제안됐어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'anky_step_a.wav', hd:1.8, refH:210, shadow:[3.3,1.6], speed:0.8,
+            FOOT:{"side": 0.882, "front": 0.876, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.235, "front": 1.01, "f34": 0.981, "back": 1.0, "r34": 0.972}, GAIT:{"side": {"p": 1.333, "t0": 1.167}, "front": {"p": 0.75, "t0": 1.083}, "f34": {"p": 1.417, "t0": 1.667}, "back": {"p": 0.833, "t0": 1.292}, "r34": {"p": 0.875, "t0": 0.542}} }
   };
   var SP_ID = (new URLSearchParams(location.search)).get('sp'); if (!SPECIES[SP_ID]) SP_ID = 'tri';
   var SP = SPECIES[SP_ID];
@@ -333,9 +334,9 @@
     } var h = document.querySelector('h1'); if (h) h.textContent = SP.name + ' 월드 시험';
   })();
   function ANKY_CLIPS(){
-    var o = {};
-    ['side','front'].forEach(function(v){                                    // 뒷모습 영상이 오면 'back'을 여기에 추가해요
-      o[v] = {}; ['idle','walk','rev','eat','roar'].forEach(function(x){ o[v][x] = 'anky_' + v + '_' + (x === 'rev' ? 'walk_rev' : x) + '.webm'; });
+    var o = {}, base = ['idle', 'walk', 'rev'], A = { side:base.concat(['eat', 'roar']), front:base.concat(['eat', 'roar']), f34:base.concat(['eat', 'roar']), back:base.concat(['look', 'tail']), r34:base.concat(['look', 'tail']) };
+    Object.keys(A).forEach(function(v){
+      o[v] = {}; A[v].forEach(function(x){ o[v][x] = 'anky_' + v + '_' + (x === 'rev' ? 'walk_rev' : x) + '.webm'; });
     });
     return o;
   }
@@ -349,7 +350,7 @@
   }
   function TRUCK_CLIPS(){
     var o = {};
-    ['side','front','f34','back','r34'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm' }; });
+    ['side','front','f34','back','v60','v120','v150'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm' }; });
     return o;
   }
   function PTERO_CLIPS(){
@@ -377,9 +378,9 @@
   /* 방향마다 걷는 영상의 걸음 주기(초)와, 몸이 가장 낮아지는 기준 시점(초). 방향이 바뀔 때 걸음 위치를 이어 주는 데 씁니다. */
   var GAIT = SP.GAIT;
   var FOOT_REF = 0.882;                                      // 모든 방향의 발바닥을 맞추는 기준 높이
-  var FLIP = { side:true, f34:true, r34:true, f_side:true, f_f34:true, f_r34:true };           // 좌우로 뒤집는 방향(왼쪽으로 갈 때)
+  var FLIP = { side:true, f34:true, r34:true, v60:true, v120:true, v150:true, f_side:true, f_f34:true, f_r34:true };           // 좌우로 뒤집는 방향(왼쪽으로 갈 때)
   var REAR = { back:true, r34:true };                      // 뒤돌아보기·꼬리 흔들기가 있는 방향   // 영상 안에서 발바닥 높이 비율
-  var VLABEL = { side:'옆모습', f34:'앞 비스듬히', front:'정면', r34:'뒤 비스듬히', back:'뒷모습' };
+  var VLABEL = { side:'옆모습', f34:'앞 비스듬히', front:'정면', r34:'뒤 비스듬히', back:'뒷모습', v60:'앞 옆쪽 비스듬히', v120:'뒤 옆쪽 비스듬히', v150:'뒤 비스듬히' };
   var LABEL = { idle:'대기', walk:'걷기', rev:'뒷걸음질', eat:'먹기', roar:'울음', look:'뒤돌아보기', tail:'꼬리 흔들기' };
   var VLABEL_F = { f_side:'옆모습 (비행)', f_f34:'앞 비스듬히 (비행)', f_front:'정면 (비행)', f_r34:'뒤 비스듬히 (비행)', f_back:'뒷모습 (비행)' };
   for (var vk in VLABEL_F) VLABEL[vk] = VLABEL_F[vk];
@@ -442,7 +443,7 @@
   }
   function startBackground(){                                                    // 다른 방향으로 돌 때 쓰는 대기·걷기 영상만 미리 받아 둬요
     if (bgStarted) return; bgStarted = true;
-    ['front', 'f34', 'back', 'r34'].forEach(function(v){ queueLoad(v + ':idle'); queueLoad(v + ':walk'); });
+    Object.keys(CLIPS).forEach(function(v){ if (v !== 'side' && CLIPS[v] && CLIPS[v].idle){ queueLoad(v + ':idle'); queueLoad(v + ':walk'); } });
   }
   need('side:idle'); need('side:walk');
 
@@ -565,6 +566,7 @@
   /* ---------- 동작 전환 ---------- */
   var pauseTimer = null;
   function currentRate(){ return opt.rate * (shiftDown ? 1.6 : 1); }
+  function spinMul(view){ return SP.spin ? (SP.spin[view] || 1) * (shiftDown ? (SP.spinShift || 1) : 1) : 1; }          // 바퀴만 따로 빠르게 (이동 속도는 그대로)
   function setClip(view, act){
     var key = view + ':' + act;
     if (st.key === key) return;
@@ -583,7 +585,7 @@
       if (v.duration && isFinite(v.duration)) t = t % v.duration;
     }
     try { v.currentTime = t; } catch(e){}
-    v.playbackRate = (act === 'walk') ? currentRate() : (act === 'rev') ? currentRate() * opt.back : 1;
+    v.playbackRate = (act === 'walk') ? currentRate() * spinMul(view) : (act === 'rev') ? currentRate() * opt.back * spinMul(view) : 1;
     var p = v.play(); if (p && p.catch) p.catch(function(){});
     for (var k in vids){ vids[k].classList.toggle('on', k === key); }
     clearTimeout(pauseTimer);
@@ -595,6 +597,9 @@
   function wrapPi(a){ while (a <= -Math.PI) a += 2 * Math.PI; while (a > Math.PI) a -= 2 * Math.PI; return a; }
   /* 진행 각도(0°=오른쪽, 90°=정면, -90°=뒷모습)를 옆모습/비스듬히/정면·뒷모습 구간으로 나눕니다.
      경계 근처에서 영상이 깜빡이지 않도록 6°의 여유를 둡니다. */
+  function bandFor12(th, prev){                                   // 차량: 30도 간격 4구간 (옆 · 30도 · 60도 · 정면/뒷면)
+    var b = Math.min(3, Math.round(th / 30)); if (b !== prev && Math.abs(th - prev * 30) < 21) return prev; return b;
+  }
   function bandFor(th, prev){
     var t1 = (prev === 0) ? 22.5 + 6 : 22.5 - 6;
     if (th < t1) return 0;
@@ -604,7 +609,7 @@
   /* 영상 파일이 없는 방향은 가까운 방향으로 대신합니다 */
   function usable(view){
     if (CLIPS[view] && !has(view, 'walk')){ need(view + ':walk'); need(view + ':idle'); }
-    var order = { f34:['f34','side'], r34:['r34','back','side'], front:['front','side'], back:['back','side'], side:['side'] }[view];
+    var order = { f34:['f34','side'], r34:['r34','back','side'], front:['front','side'], back:['back','side'], side:['side'], v60:['v60','f34','side'], v120:['v120','back','side'], v150:['v150','back','side'] }[view] || ['side'];
     for (var i = 0; i < order.length; i++){ if (order[i] === 'side' || has(order[i], 'walk')) return order[i]; }
     return 'side';
   }
@@ -919,9 +924,9 @@
   } catch (err) { if (window.console) console.warn('touch ui', err); }
 
   /* ---------- 걸음 소리: 영상에서 발이 땅에 닿는 순간마다 '쿵' ---------- */
-  var STEPS = {"tri":{"side":{"walk":{"dur":3.583,"t":[0.042,0.927,1.854,2.802]},"rev":{"dur":3.583,"t":[0.385,1.036,1.746,2.46,3.194]}},"front":{"walk":{"dur":4.5,"t":[0.344,1.115,1.844,2.594,3.344,4.094]},"rev":{"dur":4.5,"t":[0.094,0.844,1.594,2.344,3.094,3.844]}},"f34":{"walk":{"dur":2.917,"t":[0.458,1.177,1.896,2.677]},"rev":{"dur":2.917,"t":[0.615,1.559,2.524]}},"back":{"walk":{"dur":4.625,"t":[0.312,1.094,1.854,2.594,3.375,4.156]},"rev":{"dur":4.625,"t":[0.136,0.916,1.677,2.437,3.198,3.979]}},"r34":{"walk":{"dur":2.833,"t":[0.0,0.729,1.417,2.146]},"rev":{"dur":2.833,"t":[0.5,1.187,1.875,2.646]}}},"trex":{"side":{"walk":{"dur":4.667,"t":[0.177,1.123,2.09,3.035,3.939]},"rev":{"dur":4.667,"t":[0.479,1.362,2.267,3.233,4.179]}},"front":{"walk":{"dur":3.5,"t":[0.094,0.969,1.823,2.677]},"rev":{"dur":3.5,"t":[0.312,1.167,2.021,2.937]}},"f34":{"walk":{"dur":3.25,"t":[0.167,0.969,1.729,2.531]},"rev":{"dur":3.25,"t":[0.437,1.198,2.062,2.844]}},"back":{"walk":{"dur":3.458,"t":[0.677,1.526,2.396,3.245]},"rev":{"dur":3.458,"t":[0.812,1.682,2.51,3.401]}},"r34":{"walk":{"dur":3.917,"t":[0.948,1.875,1.917,2.865]},"rev":{"dur":3.917,"t":[0.771,1.677,2.687,3.614]}}},"edmo":{"side":{"walk":{"dur":3.167,"t":[0.271,1.319,2.41]},"rev":{"dur":3.167,"t":[0.073,1.143,2.191]}},"front":{"walk":{"dur":3.583,"t":[0.667,1.615,2.479,3.386]},"rev":{"dur":3.583,"t":[0.656,1.562,2.427,3.438]}},"f34":{"walk":{"dur":3.167,"t":[0.292,1.104,1.896,2.667]},"rev":{"dur":3.167,"t":[0.729,1.562,1.583,2.333]}},"back":{"walk":{"dur":4.917,"t":[0.198,1.045,1.851,2.677,3.462,4.309]},"rev":{"dur":4.917,"t":[0.229,1.076,1.84,2.687,3.493,4.34]}},"r34":{"walk":{"dur":4.083,"t":[0.125,0.971,1.775,2.6,3.425]},"rev":{"dur":4.083,"t":[0.229,1.096,1.754,2.683,3.475]}}},"ptero":{"side":{"walk":{"dur":4.833,"t":[0.656,1.517,2.253,3.031,3.872,4.691]},"rev":{"dur":4.833,"t":[0.615,1.434,2.233,2.989,3.809,4.712]}},"front":{"walk":{"dur":3.792,"t":[0.115,0.722,1.351,1.958,2.608,3.257]},"rev":{"dur":3.792,"t":[0.25,0.878,1.528,2.177,2.805,3.413]}},"f34":{"walk":{"dur":4.167,"t":[0.687,1.41,2.069,2.09,2.708,3.451]},"rev":{"dur":4.167,"t":[0.396,1.035,1.778,2.417,3.18,3.778]}},"back":{"walk":{"dur":4.583,"t":[0.552,1.11,1.646,2.203,2.245,2.76,3.338,3.917]},"rev":{"dur":4.583,"t":[0.125,0.634,1.113,1.66,2.185,2.711,3.194,3.741,4.183]}},"r34":{"walk":{"dur":3.958,"t":[0.479,1.312,2.104,2.834,3.687]},"rev":{"dur":3.958,"t":[0.604,1.458,2.354,3.083,3.875]}}}};
-  var STEPFILES = { tri:['tri_step_a.wav', 'tri_step_b.wav', 'tri_step_c.wav'], trex:['trex_step_a.wav', 'trex_step_b.wav', 'trex_step_c.wav'], edmo:['edmo_step_a.wav', 'edmo_step_b.wav'], ptero:['ptero_step_a.wav', 'ptero_step_b.wav'] };
-  var STEPVOL = { tri:0.62, trex:0.72, edmo:0.62, ptero:0.5 };
+  var STEPS = {"tri":{"side":{"walk":{"dur":3.583,"t":[0.042,0.927,1.854,2.802]},"rev":{"dur":3.583,"t":[0.385,1.036,1.746,2.46,3.194]}},"front":{"walk":{"dur":4.5,"t":[0.344,1.115,1.844,2.594,3.344,4.094]},"rev":{"dur":4.5,"t":[0.094,0.844,1.594,2.344,3.094,3.844]}},"f34":{"walk":{"dur":2.917,"t":[0.458,1.177,1.896,2.677]},"rev":{"dur":2.917,"t":[0.615,1.559,2.524]}},"back":{"walk":{"dur":4.625,"t":[0.312,1.094,1.854,2.594,3.375,4.156]},"rev":{"dur":4.625,"t":[0.136,0.916,1.677,2.437,3.198,3.979]}},"r34":{"walk":{"dur":2.833,"t":[0.0,0.729,1.417,2.146]},"rev":{"dur":2.833,"t":[0.5,1.187,1.875,2.646]}}},"trex":{"side":{"walk":{"dur":4.667,"t":[0.177,1.123,2.09,3.035,3.939]},"rev":{"dur":4.667,"t":[0.479,1.362,2.267,3.233,4.179]}},"front":{"walk":{"dur":3.5,"t":[0.094,0.969,1.823,2.677]},"rev":{"dur":3.5,"t":[0.312,1.167,2.021,2.937]}},"f34":{"walk":{"dur":3.25,"t":[0.167,0.969,1.729,2.531]},"rev":{"dur":3.25,"t":[0.437,1.198,2.062,2.844]}},"back":{"walk":{"dur":3.458,"t":[0.677,1.526,2.396,3.245]},"rev":{"dur":3.458,"t":[0.812,1.682,2.51,3.401]}},"r34":{"walk":{"dur":3.917,"t":[0.948,1.875,1.917,2.865]},"rev":{"dur":3.917,"t":[0.771,1.677,2.687,3.614]}}},"edmo":{"side":{"walk":{"dur":3.167,"t":[0.271,1.319,2.41]},"rev":{"dur":3.167,"t":[0.073,1.143,2.191]}},"front":{"walk":{"dur":3.583,"t":[0.667,1.615,2.479,3.386]},"rev":{"dur":3.583,"t":[0.656,1.562,2.427,3.438]}},"f34":{"walk":{"dur":3.167,"t":[0.292,1.104,1.896,2.667]},"rev":{"dur":3.167,"t":[0.729,1.562,1.583,2.333]}},"back":{"walk":{"dur":4.917,"t":[0.198,1.045,1.851,2.677,3.462,4.309]},"rev":{"dur":4.917,"t":[0.229,1.076,1.84,2.687,3.493,4.34]}},"r34":{"walk":{"dur":4.083,"t":[0.125,0.971,1.775,2.6,3.425]},"rev":{"dur":4.083,"t":[0.229,1.096,1.754,2.683,3.475]}}},"ptero":{"side":{"walk":{"dur":4.833,"t":[0.656,1.517,2.253,3.031,3.872,4.691]},"rev":{"dur":4.833,"t":[0.615,1.434,2.233,2.989,3.809,4.712]}},"front":{"walk":{"dur":3.792,"t":[0.115,0.722,1.351,1.958,2.608,3.257]},"rev":{"dur":3.792,"t":[0.25,0.878,1.528,2.177,2.805,3.413]}},"f34":{"walk":{"dur":4.167,"t":[0.687,1.41,2.069,2.09,2.708,3.451]},"rev":{"dur":4.167,"t":[0.396,1.035,1.778,2.417,3.18,3.778]}},"back":{"walk":{"dur":4.583,"t":[0.552,1.11,1.646,2.203,2.245,2.76,3.338,3.917]},"rev":{"dur":4.583,"t":[0.125,0.634,1.113,1.66,2.185,2.711,3.194,3.741,4.183]}},"r34":{"walk":{"dur":3.958,"t":[0.479,1.312,2.104,2.834,3.687]},"rev":{"dur":3.958,"t":[0.604,1.458,2.354,3.083,3.875]}}},"anky":{"side":{"walk":{"dur":2.458,"t":[0.584,1.347,2.132]},"rev":{"dur":2.458,"t":[0.375,1.222,2.007]}},"front":{"walk":{"dur":4.583,"t":[0.25,1.028,1.826,2.562,3.34,4.056]},"rev":{"dur":4.583,"t":[0.25,1.007,1.743,2.5,3.278,4.055]}},"f34":{"walk":{"dur":4.333,"t":[0.788,1.507,2.177,2.261,2.976,3.691]},"rev":{"dur":4.333,"t":[0.219,1.038,1.691,2.448,3.059,3.816]}},"back":{"walk":{"dur":3.458,"t":[0.312,1.182,2.052,2.88]},"rev":{"dur":3.458,"t":[0.115,0.984,1.813,2.724]}},"r34":{"walk":{"dur":3.625,"t":[0.208,1.141,2.021,2.943]},"rev":{"dur":3.625,"t":[0.271,1.193,2.083,3.016]}}}};
+  var STEPFILES = { tri:['tri_step_a.wav', 'tri_step_b.wav', 'tri_step_c.wav'], trex:['trex_step_a.wav', 'trex_step_b.wav', 'trex_step_c.wav'], edmo:['edmo_step_a.wav', 'edmo_step_b.wav'], ptero:['ptero_step_a.wav', 'ptero_step_b.wav'], anky:['anky_step_a.wav', 'anky_step_b.wav', 'anky_step_c.wav'] };
+  var STEPVOL = { tri:0.62, trex:0.72, edmo:0.62, ptero:0.5, anky:0.72 };
   var stepAC = null, stepBuf = {}, stepFail = false, stepPool = {}, stepLastVar = -1, stepLast = { key:null, t:0 }, stepReal = 0;
   function stepCtx(){
     var files = (STEPFILES[SP_ID] || []).concat(SP.wings ? WINGFILES : []); if (!files.length || stepAC || stepFail) return;
@@ -1130,7 +1135,7 @@
     var s = $(id), o = $(outId);
     var upd = function(){
       opt[key] = parseFloat(s.value); o.textContent = opt[key].toFixed(digits);
-      if ((key === 'rate' || key === 'back') && (st.action === 'walk' || st.action === 'rev') && vids[st.key]) vids[st.key].playbackRate = currentRate() * (st.action === 'rev' ? opt.back : 1);
+      if ((key === 'rate' || key === 'back') && (st.action === 'walk' || st.action === 'rev') && vids[st.key]) vids[st.key].playbackRate = currentRate() * (st.action === 'rev' ? opt.back : 1) * spinMul(st.view);
       if (key === 'fade') for (var k in vids) vids[k].style.transitionDuration = opt.fade + 's';
       if (key === 'camd') cam.dist = opt.camd;
       if (key === 'camh') cam.h = opt.camh;
@@ -1181,7 +1186,7 @@
         // 뒷걸음질: 몸이 보는 방향은 그대로 두고, 반대쪽으로 천천히 물러납니다 (걷기 영상을 거꾸로 재생)
         show(st.view, 'rev');
         var rb = currentRate() * opt.back;
-        if (vids[st.key]) vids[st.key].playbackRate = rb;
+        if (vids[st.key]) vids[st.key].playbackRate = rb * spinMul(st.view);
         walk(-Math.cos(st.hd), -Math.sin(st.hd), vxM * SCALE[st.view] * rb, vzM * rb);
       } else if (dx || dz){
         // 키가 가리키는 방향으로 몸이 정해진 속도로 천천히 돕니다 (한 번에 꺾이지 않음)
@@ -1194,18 +1199,18 @@
         var c = Math.cos(st.hd), d = Math.sin(st.hd);
         if (Math.abs(c) > 0.1) st.face = c > 0 ? 1 : -1;
         var th = Math.atan2(Math.abs(d), Math.abs(c)) * 180 / Math.PI;
-        st.band = bandFor(th, st.band);
-        var want = st.band === 0 ? 'side' : st.band === 1 ? (d >= 0 ? 'f34' : 'r34') : (d >= 0 ? 'front' : 'back');
+        st.band = SP.bands12 ? bandFor12(th, st.band) : bandFor(th, st.band);
+        var want = SP.bands12 ? (d >= 0 ? ['side', 'v60', 'f34', 'front'] : ['side', 'v120', 'v150', 'back'])[st.band] : (st.band === 0 ? 'side' : st.band === 1 ? (d >= 0 ? 'f34' : 'r34') : (d >= 0 ? 'front' : 'back'));
         if (air) show(usableF(want), shiftDown ? 'glide' : 'flap'); else show(usable(want), 'walk');
         var rate = currentRate();
-        if (vids[st.key]) vids[st.key].playbackRate = air ? ((SP.glideRate && /:glide$/.test(st.key)) ? (SP.glideRate[st.view] || 1) : 1) : rate;
+        if (vids[st.key]) vids[st.key].playbackRate = air ? ((SP.glideRate && /:glide$/.test(st.key)) ? (SP.glideRate[st.view] || 1) : 1) : rate * spinMul(st.view);
         // 도는 동안은 속도를 줄이고, 이동은 지금 몸이 향한 방향으로 합니다
         var sp = 1 - opt.slow * Math.min(1, err / 90);
         walk(c, d, vxM * SCALE[st.view] * rate * sp, vzM * rate * sp);
       } else if (keys.e && !air){
         show(st.view, 'eat');
-      } else if (keys.t && REAR[st.view] && has(st.view, 'tail') && !SP.onceTail && !air){
-        show(st.view, 'tail');
+      } else if (keys.t && REAR[st.view] && CLIPS[st.view] && CLIPS[st.view].tail && !SP.onceTail && !air){
+        if (has(st.view, 'tail')) show(st.view, 'tail'); else { need(st.view + ':tail'); show(st.view, 'idle'); }          // 꼬리 영상은 처음 누를 때 받아요
       } else {
         if (air) show(usableF(baseView(st.view)), 'flap'); else show(st.view, 'idle');
       }
