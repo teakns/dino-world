@@ -238,7 +238,7 @@
         <span class="k"><kbd>Shift</kbd></span><span>누르고 걸으면 빠르게</span>
         <span class="k"><kbd>W</kbd></span><span>누르는 동안 <b>뒷걸음질</b> (보고 있는 방향은 그대로, 뒤로 물러남)</span>
         <span class="k"><kbd>E</kbd></span><span>누르는 동안 먹기 (옆·정면·앞 비스듬히)</span>
-        <span class="k"><kbd>R</kbd></span><span>울음 (옆·정면·앞 비스듬히)</span>
+        <span class="k"><kbd>R</kbd></span><span id="hRoar">울음 (옆·정면·앞 비스듬히)</span>
         <span class="k"><kbd>마우스 드래그</kbd></span><span><b>시점 돌리기</b>. 방향키는 항상 <b>화면 기준</b>이라, 시점을 돌리면 공룡이 가는 월드 방향도 달라집니다. 휠로 가까이·멀리</span>
         <span class="k"><kbd>V</kbd></span><span>시점을 처음으로 되돌리기</span>
         <span class="k"><kbd>C</kbd></span><span>풍경 바꾸기: 낮 → 아침 → 해질녘 → 흐림 → 비 → 밤 (화면의 🌤 버튼으로 고르기, 배경 동물 켜고 끄기)</span>
@@ -271,7 +271,7 @@
   </div>
 
   <p class="check"><b>살펴볼 점</b> 벽 네 장이 만나는 <b>모서리</b>가 눈에 띄는지(마우스로 시점을 한 바퀴 돌려 보세요), 하늘이 이어지는지, 바닥 무늬가 반복돼 보이는지, 공룡이 땅에 제대로 서 있는지, 공룡 크기가 풍경에 어울리는지, 멀리 갈수록 넓은 느낌이 나는지.</p>
-  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_step_a/b/c.wav</b>, <b>ptero_wing_a/b.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 15개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
+  <footer>크롬·엣지에서 열어 주세요. (소리 파일 <b>roar_…mp3</b>, <b>…_step_a/b/c.wav</b>, <b>ptero_wing_a/b.wav</b>도 같은 폴더에 두세요, 에드몬토사우루스는 <b>edmo_…</b> 영상 25개, 사파리 차량은 <b>truck_…</b> 영상 25개와 <b>truck_…wav·mp3</b> 소리 4개, 익룡은 <b>ptero_…</b> 영상 50개) 이 파일과 <b>three.min.js</b>, <b>world_tex.js</b>, 선택한 공룡의 영상 25개(트리케라톱스는 idle·front_… 등, 티라노사우루스는 trex_…)가 같은 폴더에 있어야 합니다.</footer>
 </div>
 
 <script src="three.min.js"></script>
@@ -294,23 +294,31 @@
     ptero:{ name:'익룡 (헬크릭 아즈다르키드)', sounds:{ roar:'roar_ptero.mp3' }, soundsSci:{ roar:'roar_ptero_sci.mp3' }, capSci:"익룡의 울음은 증거가 거의 없어요. 황새처럼 부리를 부딪치거나 꺽꺽거렸을 거라고 상상해서 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'ptero_steps.wav', wings:'ptero_wings.wav', hd:2.0, refH:258, shadow:[1.9,1.3], speed:0.9, airSpeed:2.2, alt:5, flight:true, glideRate:{ f_side:0.5 },
             once:['roar','look','tail','takeoff','land'], onceTail:true,
             FOOT:{"side": 0.882, "f_side": 0.846, "front": 0.882, "f_front": 0.882, "f34": 0.882, "f_f34": 0.834, "back": 0.882, "f_back": 0.882, "r34": 0.876, "f_r34": 0.828}, SCALE:{"side": 1.223, "f_side": 1.229, "front": 0.985, "f_front": 0.993, "f34": 1.0, "f_f34": 1.183, "back": 1.0, "f_back": 1.016, "r34": 0.992, "f_r34": 1.194}, GAIT:{"side": {"p": 0.792, "t0": 0.875}, "front": {"p": 1.208, "t0": 1.458}, "f34": {"p": 1.375, "t0": 0.792}, "back": {"p": 1.083, "t0": 1.333}, "r34": {"p": 0.792, "t0": 0.708}} },
-    truck:{ name:'탐사 사파리 차량', hd:2.9, refH:299, shadow:[3.0,1.4], speed:1.9, once:[],
-            FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879, "v60": 0.88, "v120": 0.882, "v150": 0.882}, SCALE:{side:1,front:1,back:1,f34:1,r34:1,v60:1,v120:1,v150:1},
-            GAIT:{side:{p:1.417,t0:0},front:{p:2.25,t0:0},back:{p:1.875,t0:0},f34:{p:1.125,t0:0},r34:{p:1.125,t0:0},v60:{p:1.167,t0:0},v120:{p:1.167,t0:0},v150:{p:1.167,t0:0}},
-            spin:{side:1,f34:1,r34:1,front:1.4,back:1.4,v60:1,v120:1,v150:1}, spinShift:1.12, bands12:true },
+    truck:{ name:'탐사 사파리 차량', hd:2.9, refH:201, shadow:[3.0,1.4], speed:1.9, once:['roar'], fastClip:true, noShake:true, lblRoar:'경적', lblStep:'엔진 소리',
+            sounds:{ roar:'truck_horn.mp3' }, engine:{ idle:'truck_idle.wav', drive:'truck_drive.wav', fast:'truck_fast.wav' },
+            FOOT:{side:0.799,front:0.799,back:0.799,f34:0.799,r34:0.799}, SCALE:{side:1,front:1,back:1,f34:1,r34:1},
+            GAIT:{side:{p:1.458,t0:0},front:{p:2.5,t0:0},back:{p:1.708,t0:0},f34:{p:1.333,t0:0},r34:{p:1.167,t0:0}} },
     edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, soundsSci:{ roar:'roar_edmo_sci.mp3' }, capSci:"학자 추정: 새와 악어의 친척이라 오리처럼 낮게 꽥꽥거렸을 수 있다는 의견이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
             FOOT:{"side": 0.882, "front": 0.882, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.15, "front": 1.0, "f34": 1.02, "back": 0.949, "r34": 0.963}, GAIT:{"side": {"p": 1.042, "t0": 0.625}, "front": {"p": 0.875, "t0": 0.917}, "f34": {"p": 0.792, "t0": 0.583}, "back": {"p": 0.792, "t0": 1.25}, "r34": {"p": 0.792, "t0": 1.208}} },
     anky:{ name:'안킬로사우루스', sounds:{ roar:'roar_anky.mp3' }, soundsSci:{ roar:'roar_anky_sci.mp3' }, capSci:"학자 추정: 안킬로사우루스류의 후두를 분석한 연구에서 새처럼 크고 터지는 듯한 소리를 냈을 가능성이 제안됐어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'anky_step_a.wav', hd:1.8, refH:210, shadow:[3.3,1.6], speed:0.8,
-            FOOT:{"side": 0.882, "front": 0.876, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.235, "front": 1.01, "f34": 0.981, "back": 1.0, "r34": 0.972}, GAIT:{"side": {"p": 1.333, "t0": 1.167}, "front": {"p": 0.75, "t0": 1.083}, "f34": {"p": 1.417, "t0": 1.667}, "back": {"p": 0.833, "t0": 1.292}, "r34": {"p": 0.875, "t0": 0.542}} }
+            FOOT:{"side": 0.882, "front": 0.876, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.235, "front": 1.01, "f34": 0.981, "back": 1.0, "r34": 0.972}, GAIT:{"side": {"p": 1.333, "t0": 1.167}, "front": {"p": 0.75, "t0": 1.083}, "f34": {"p": 1.417, "t0": 1.667}, "back": {"p": 0.833, "t0": 1.292}, "r34": {"p": 0.875, "t0": 0.542}} },
+    boreal:{ name:'보레알로수쿠스', ambOnly:true, hd:0.68, refH:90, FOOT:{side:0.778}, SCALE:{side:1} },
+    basil:{ name:'바실레미스', ambOnly:true, hd:0.542, refH:170, FOOT:{side:0.772}, SCALE:{side:1} },
+    apalone:{ name:'자라(스라소니거북)', ambOnly:true, hd:0.253, refH:173, FOOT:{side:0.772}, SCALE:{side:1} },
+    frog:{ name:'개구리', ambOnly:true, hd:0.082, refH:169, FOOT:{side:0.769}, SCALE:{side:1} },
+    didel:{ name:'디델포돈', ambOnly:true, hd:0.275, refH:158, FOOT:{side:0.769}, SCALE:{side:1} },
+    alpha:{ name:'알파돈', ambOnly:true, hd:0.127, refH:146, FOOT:{side:0.763}, SCALE:{side:1} },
+    menis:{ name:'메니스코에수스', ambOnly:true, hd:0.188, refH:164, FOOT:{side:0.769}, SCALE:{side:1} },
+    cimol:{ name:'키몰레스테스', ambOnly:true, hd:0.061, refH:123, FOOT:{side:0.769}, SCALE:{side:1} }
   };
-  var SP_ID = (new URLSearchParams(location.search)).get('sp'); if (!SPECIES[SP_ID]) SP_ID = 'tri';
+  var SP_ID = (new URLSearchParams(location.search)).get('sp'); if (!SPECIES[SP_ID] || SPECIES[SP_ID].ambOnly) SP_ID = 'tri';
   var SP = SPECIES[SP_ID];
   (function(){
     var sel = document.getElementById('selSp'); if (sel){ sel.value = SP_ID; sel.addEventListener('change', function(){ location.search = '?sp=' + sel.value; }); }
-    document.title = SP.name + ' 월드 시험';
+    document.title = SP.name + ' 월드 시험'; if (SP.lblRoar){ var hr = document.getElementById('hRoar'); if (hr) hr.textContent = SP.lblRoar + ' (모든 방향)'; }
     if (SP.sounds){
       var pan = document.createElement('div'); pan.id = 'sndPanel';
-      pan.innerHTML = '<span>🔊 소리</span><label><input type="checkbox" id="chkRoar" checked> 울음</label><label><input type="checkbox" id="chkStep" checked> ' + (SP.wings ? '발소리·날갯짓' : '발소리') + '</label>'
+      pan.innerHTML = '<span>🔊 소리</span><label><input type="checkbox" id="chkRoar" checked> ' + (SP.lblRoar || '울음') + '</label><label><input type="checkbox" id="chkStep" checked> ' + (SP.wings ? '발소리·날갯짓' : (SP.lblStep || '발소리')) + '</label>'
         + (SP.soundsSci ? '<span style="flex-basis:100%;height:0"></span><span>울음 종류</span><label><input type="radio" name="sndMode" id="modeMovie"> 영화식</label><label><input type="radio" name="sndMode" id="modeSci"> 학자 추정</label>' : '');
       var stg = document.getElementById('stage'); if (stg) stg.appendChild(pan);
       pan.addEventListener('change', function(e){ if (e.target && e.target.blur) e.target.blur(); });
@@ -350,7 +358,7 @@
   }
   function TRUCK_CLIPS(){
     var o = {};
-    ['side','front','f34','back','v60','v120','v150'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm' }; });
+    ['side','front','back','f34','r34'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm', fast:'truck_' + v + '_fast.webm', roar:'truck_' + v + '_roar.webm' }; });
     return o;
   }
   function PTERO_CLIPS(){
@@ -372,7 +380,7 @@
     var o = {}, A = { side:['idle','walk','rev','eat','roar'], front:['idle','walk','rev','eat','roar'], f34:['idle','walk','rev','eat','roar'], back:['idle','walk','rev','look','tail'], r34:['idle','walk','rev','look','tail'] };
     Object.keys(A).forEach(function(v){ o[v] = {}; A[v].forEach(function(a){ o[v][a] = 'trex_' + v + '_' + (a === 'rev' ? 'walk_rev' : a) + '.webm'; }); });
     return o; })();
-  var REQ_KEYS = { 'side:idle':true, 'side:walk':true };   // 화면을 열 때 꼭 필요한 영상
+  var REQ_KEYS = { 'side:idle':true, 'side:walk':true }; if (SP_ID === 'truck'){ ['side', 'front', 'back', 'f34', 'r34'].forEach(function(v){ REQ_KEYS[v + ':roar'] = true; }); }   // 화면을 열 때 꼭 필요한 영상
   var FOOT = SP.FOOT;
   var SCALE = SP.SCALE;
   /* 방향마다 걷는 영상의 걸음 주기(초)와, 몸이 가장 낮아지는 기준 시점(초). 방향이 바뀔 때 걸음 위치를 이어 주는 데 씁니다. */
@@ -385,7 +393,7 @@
   var VLABEL_F = { f_side:'옆모습 (비행)', f_f34:'앞 비스듬히 (비행)', f_front:'정면 (비행)', f_r34:'뒤 비스듬히 (비행)', f_back:'뒷모습 (비행)' };
   for (var vk in VLABEL_F) VLABEL[vk] = VLABEL_F[vk];
   LABEL.flap = '날갯짓'; LABEL.glide = '활강'; LABEL.takeoff = '이륙'; LABEL.land = '착륙'; if (SP.onceTail) LABEL.tail = '날개 펴기';
-  if (SP_ID === 'truck'){ LABEL.idle = '정차'; LABEL.walk = '주행'; LABEL.rev = '후진'; }
+  if (SP_ID === 'truck'){ LABEL.idle = '정차'; LABEL.walk = '주행'; LABEL.rev = '후진'; LABEL.fast = '빠른 주행'; LABEL.roar = '경적'; }
   var ASPECT = 338/620;
 
   var st = { wx:0, wz:0, face:1, view:'side', action:'', key:'', lock:false, hd:0, band:0, air:0, alt:0 };
@@ -473,7 +481,7 @@
 
   /* ---------- 3D 월드: 벽 4장(하늘 상자) + 하늘 + 바닥 ---------- */
   var ENVU = { tint:{ value:null }, bright:{ value:1 }, sat:{ value:1 } };
-  var gl = $('#gl'), renderer = null, scene = null, camera = null, skyRig = null, floorMesh = null, shadowGroup = null, shadowMesh = null, P = null;
+  var gl = $('#gl'), renderer = null, scene = null, camera = null, skyRig = null, floorMesh = null, shadowGroup = null, shadowMesh = null, P = null, wallMats = {}, domeMat = null, ringTexObj = null, texLoaderRef = null, anisoRef = 1, sceneHaze = [1, 1, 1], curScene = 'plain';
   var cam = { yaw:0, pitch:4, dist:14, h:3.2, tx:0, tz:0, ty:0 };
   (function buildWorld(){
     function stop(msg){
@@ -493,8 +501,8 @@
     camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.5, 6000);
     skyRig = new THREE.Group(); scene.add(skyRig);
     P = new THREE.Vector3();
-    var aniso = renderer.capabilities.getMaxAnisotropy();
-    var loader = new THREE.TextureLoader();
+    var aniso = renderer.capabilities.getMaxAnisotropy(); anisoRef = aniso;
+    var loader = new THREE.TextureLoader(); texLoaderRef = loader;
     reqTotal += 10;
     function loadTex(name, repeat){
       var t = loader.load(window.TEX[name], function(){ oneReady(); }, undefined, function(){ stop(['그림 파일을 읽지 못했어요.', 'world_tex.js가 깨졌을 수 있어요. 파일을 다시 받아 주세요.']); });
@@ -514,7 +522,7 @@
     Object.keys(walls).forEach(function(k){
       var m = new THREE.ShaderMaterial({ uniforms:{ map:{ value: loadTex(k, false) }, mask:{ value: loadTex('m' + k, false) }, uTint:ENVU.tint, uBright:ENVU.bright, uSat:ENVU.sat },
         vertexShader: wallVS, fragmentShader: wallFS, transparent:true, depthWrite:false, depthTest:false });
-      var mesh = new THREE.Mesh(wallGeo, m);
+      var mesh = new THREE.Mesh(wallGeo, m); wallMats[k] = m;
       mesh.position.set(walls[k].p[0], yc, walls[k].p[1]); mesh.rotation.y = walls[k].ry; mesh.renderOrder = 1;
       skyRig.add(mesh);
     });
@@ -537,7 +545,7 @@
     var dome = new THREE.Mesh(new THREE.SphereGeometry(2800, 64, 24, 0, Math.PI * 2, 0, Math.PI / 2),
       new THREE.ShaderMaterial({ uniforms:{ map:{ value: loadTex('sky', false) }, ring:{ value: ringTex }, tintAmt:{ value: 0.88 }, uTint:ENVU.tint, uBright:ENVU.bright, uSat:ENVU.sat }, vertexShader:'varying vec3 vDir; void main(){ vDir = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
         fragmentShader: domeFS, side: THREE.BackSide, transparent:true, depthWrite:false, depthTest:false }));
-    dome.renderOrder = 0; skyRig.add(dome);
+    dome.renderOrder = 0; skyRig.add(dome); domeMat = dome.material; ringTexObj = ringTex;
 
     /* 바닥: 같은 그림을 크기·각도를 달리해 두 겹으로 섞어 반복이 덜 보이게 하고, 멀어지면 투명해져 벽의 땅과 이어집니다. */
     var floorFS = 'uniform sampler2D map; uniform float tile; uniform vec3 haze; uniform vec2 fade; uniform vec3 uTint; uniform float uBright; uniform float uSat; varying vec3 vW;\n' + GRADE_GLSL +
@@ -585,7 +593,7 @@
       if (v.duration && isFinite(v.duration)) t = t % v.duration;
     }
     try { v.currentTime = t; } catch(e){}
-    v.playbackRate = (act === 'walk') ? currentRate() * spinMul(view) : (act === 'rev') ? currentRate() * opt.back * spinMul(view) : 1;
+    v.playbackRate = (act === 'fast') ? opt.rate : (act === 'walk') ? currentRate() * spinMul(view) : (act === 'rev') ? currentRate() * opt.back * spinMul(view) : 1;
     var p = v.play(); if (p && p.catch) p.catch(function(){});
     for (var k in vids){ vids[k].classList.toggle('on', k === key); }
     clearTimeout(pauseTimer);
@@ -697,7 +705,7 @@
       if (act === 'roar') playSound('roar');
       st.lock = true; st.key = '';
       if (act === 'look') setClip(st.view, 'look'); else show(st.view, act);
-      if (act === 'roar' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      if (act === 'roar' && !SP.noShake && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
         setTimeout(function(){ if (st.lock) stage.classList.add('shake'); }, 900);
         setTimeout(function(){ stage.classList.remove('shake'); }, 3400);
       }
@@ -779,7 +787,7 @@
     cam.dist = Math.max(6, Math.min(40, cam.dist * (1 + (e.deltaY > 0 ? 0.08 : -0.08))));
     opt.camd = cam.dist; $('#sCamD').value = cam.dist; $('#oCamD').textContent = Math.round(cam.dist);
   }, { passive:false });
-  var tapRoar = document.querySelector('[data-tap="roar"]');
+  var tapRoar = document.querySelector('[data-tap="roar"]'); if (tapRoar && SP.lblRoar) tapRoar.textContent = SP.lblRoar;
   if (tapRoar) tapRoar.addEventListener('pointerdown', function(e){ e.preventDefault(); startOnce('roar'); });
 
   /* ---------- 스마트폰·태블릿: 왼쪽 방향 패드, 오른쪽 행동 버튼, 전체 화면 ---------- */
@@ -819,7 +827,7 @@
       ['pointerup', 'pointercancel'].forEach(function(t){ b.addEventListener(t, function(){ delete keys[key]; b.classList.remove('on'); }); });
     }
     function tapBtn(b, fn){ b.addEventListener('pointerdown', function(e){ e.preventDefault(); b.classList.add('on'); setTimeout(function(){ b.classList.remove('on'); }, 170); fn(); }); }
-    if (hasAct('roar')) tapBtn(mkBtn('📣<br>울음'), function(){ startOnce('roar'); });
+    if (hasAct('roar')) tapBtn(mkBtn('📣<br>' + (SP.lblRoar || '울음')), function(){ startOnce('roar'); });
     if (hasAct('eat')) holdBtn(mkBtn('🌿<br>먹기'), 'e');
     if (hasAct('look')) tapBtn(mkBtn('👀<br>돌아보기'), function(){ if (REAR[st.view]) startOnce('look'); });
     if (hasAct('tail')){
@@ -960,6 +968,22 @@
     var i = Math.floor(Math.random() * files.length); if (i === stepLastVar) i = (i + 1) % files.length; stepLastVar = i;
     return playSample(files[i], (STEPVOL[SP_ID] || 0.6) * (0.88 + Math.random() * 0.24), 0.96 + Math.random() * 0.08);
   }
+  /* 엔진 소리: 정차 · 주행 · 빠른 주행 반복 소리를 지금 동작에 맞춰 서서히 바꿔 틀어요 (사파리 차량) */
+  var ENG = null;
+  function engineTick(dt){
+    if (!SP.engine) return;
+    if (!ENG){ ENG = {}; ['idle', 'drive', 'fast'].forEach(function(k){ var a = new Audio(SP.engine[k]); a.loop = true; a.volume = 0; a.preload = 'auto'; try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (err) {} ENG[k] = { a:a, g:0, t:0 }; }); window.__eng = ENG; }
+    var act = st.action, moving = (act === 'walk' || act === 'rev' || act === 'fast');
+    var tgt = { idle: (moving ? 0 : 1), drive: ((moving && act !== 'fast') ? 1 : 0), fast: (act === 'fast' ? 1 : 0) }, VOL = { idle:0.30, drive:0.55, fast:0.85 }, now = performance.now();
+    ['idle', 'drive', 'fast'].forEach(function(k){
+      var e = ENG[k]; e.g += (tgt[k] - e.g) * Math.min(1, dt * 5);
+      var on = sndStepOn && e.g > 0.02;
+      e.a.volume = on ? Math.min(1, VOL[k] * e.g) : 0;
+      if (k === 'drive') e.a.playbackRate = (act === 'rev') ? 0.82 : 1.0;
+      if (on && e.a.paused && now - e.t > 600){ e.t = now; var p = e.a.play(); if (p && p.catch) p.catch(function(){}); }
+      else if (!on && !e.a.paused && e.g <= 0.02) e.a.pause();
+    });
+  }
   function stepTick(){
     if (!sndStepOn || !SP.steps || !STEPS[SP_ID] || st.air !== 0){ stepLast.key = null; return; }
     var parts = (st.key || '').split(':'), view = parts[0], act = parts[1];
@@ -1008,7 +1032,7 @@
   }
 
   /* ---------- 풍경(시간·날씨)과 배경 동물 ---------- */
-  var AMB = { on:true, list:[], started:false };
+  var AMB = { on:true, list:[], started:false, big:2 };
   var envKey = 'day', envFxCtx = null, rainAmt = 0, drops = [];
   var ENVP = {
     day:     { n:'낮',     tint:[1.00, 1.00, 1.00], bright:1.00, sat:1.00, haze:[0.86, 0.78, 0.66], css:'none', vig:0.00, rain:0 },
@@ -1019,33 +1043,71 @@
     night:   { n:'밤',     tint:[0.36, 0.46, 0.78], bright:0.50, sat:0.55, haze:[0.18, 0.22, 0.36], css:'brightness(.55) saturate(.7) hue-rotate(10deg)', vig:0.60, rain:0 }
   };
   var envNow = { t:[1, 1, 1], b:1, s:1, h:[0.86, 0.78, 0.66], vig:0 };
-  try { var savedEnv = localStorage.getItem('dinoEnv'); if (savedEnv && ENVP[savedEnv]) envKey = savedEnv; if (localStorage.getItem('dinoAmb') === '0') AMB.on = false; } catch (err) {}
+  try { var savedEnv = localStorage.getItem('dinoEnv'); if (savedEnv && ENVP[savedEnv]) envKey = savedEnv; if (localStorage.getItem('dinoAmb') === '0') AMB.on = false; var sb = parseInt(localStorage.getItem('dinoSmall'), 10); if (sb === 1 || sb === 2 || sb === 3) AMB.big = sb; } catch (err) {}
   var actorsEl = document.getElementById('actors'), fxCv = document.getElementById('envFx'), vigEl = document.getElementById('envVig');
   function envToast(msg){ var el = document.getElementById('tToast'); if (!el) return; el.textContent = msg; el.style.opacity = '1'; clearTimeout(envToast.t); envToast.t = setTimeout(function(){ el.style.opacity = '0'; }, 2200); }
   function setEnv(k, quiet){
     if (!ENVP[k]) return; envKey = k; actorsEl.style.filter = ENVP[k].css;
     try { localStorage.setItem('dinoEnv', k); } catch (err) {}
-    Array.prototype.forEach.call(document.querySelectorAll('#envPanel .chip'), function(c){ c.classList.toggle('on', c.getAttribute('data-env') === k); });
+    Array.prototype.forEach.call(document.querySelectorAll('#envPanel .chip[data-env]'), function(c){ c.classList.toggle('on', c.getAttribute('data-env') === k); });
     if (!quiet) envToast('풍경: ' + ENVP[k].n);
   }
   function cycleEnv(){ var ks = Object.keys(ENVP); setEnv(ks[(ks.indexOf(envKey) + 1) % ks.length]); }
 
   /* 설정 상자 */
   var envPanel = document.createElement('div'); envPanel.id = 'envPanel';
-  envPanel.innerHTML = '<b>🌤 풍경 바꾸기</b><div class="chips">' + Object.keys(ENVP).map(function(k){ return '<button type="button" class="chip" data-env="' + k + '">' + ENVP[k].n + '</button>'; }).join('') + '</div><label><input type="checkbox" id="chkAmb"> 🦕 배경 동물 (지나가는 무리, 하늘의 익룡)</label>';
+  envPanel.innerHTML = '<b>🌤 장소와 날씨</b><div class="chips" id="sceneChips"><button type="button" class="chip" data-scene="plain">범람원</button><button type="button" class="chip" data-scene="coast">해안 삼각주</button></div><div class="chips">' + Object.keys(ENVP).map(function(k){ return '<button type="button" class="chip" data-env="' + k + '">' + ENVP[k].n + '</button>'; }).join('') + '</div><label><input type="checkbox" id="chkAmb"> 🦕 배경 동물 (지나가는 무리, 하늘의 익룡)</label>';
   stage.appendChild(envPanel);
   Array.prototype.forEach.call(envPanel.querySelectorAll('.chip'), function(c){ c.addEventListener('click', function(){ setEnv(c.getAttribute('data-env')); }); });
   var chkAmb = envPanel.querySelector('#chkAmb'); chkAmb.checked = AMB.on;
   chkAmb.addEventListener('change', function(){ AMB.on = chkAmb.checked; try { localStorage.setItem('dinoAmb', AMB.on ? '1' : '0'); } catch (err) {} chkAmb.blur(); });
+  chkAmb.parentNode.insertAdjacentHTML('afterend', '<div class="chips" id="smallChips"><span style="flex-basis:100%;font-size:.85em;opacity:.85">작은 동물 크기 (개구리·쥐 같은 동물이 너무 작아 보일 때)</span><button type="button" class="chip" data-big="1">실제 크기</button><button type="button" class="chip" data-big="2">2배</button><button type="button" class="chip" data-big="3">3배</button></div>');
+  function setBig(k){ AMB.big = k; try { localStorage.setItem('dinoSmall', String(k)); } catch (err) {} Array.prototype.forEach.call(document.querySelectorAll('#smallChips .chip'), function(c){ c.classList.toggle('on', parseInt(c.getAttribute('data-big'), 10) === k); }); }
+  Array.prototype.forEach.call(document.querySelectorAll('#smallChips .chip'), function(c){ c.addEventListener('click', function(){ setBig(parseInt(c.getAttribute('data-big'), 10)); c.blur(); }); }); setBig(AMB.big);
   function toggleEnvPanel(){ if (window.__openPanel) window.__openPanel('env'); else document.body.classList.toggle('env-open'); }
   document.getElementById('bEnvHdr').addEventListener('click', toggleEnvPanel);
   var bEnvEl = document.getElementById('bEnv'); if (bEnvEl) bEnvEl.addEventListener('pointerdown', function(e){ e.preventDefault(); toggleEnvPanel(); });
   window.addEventListener('keydown', function(e){ if ((e.key === 'c' || e.key === 'C') && !(e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName))) cycleEnv(); });
   setEnv(envKey, true);
 
+  /* ---------- 장소 바꾸기: 범람원 / 해안 삼각주 (그림 파일은 고를 때 받아요) ---------- */
+  var SCENEDEF = { plain:{ name:'범람원' }, coast:{ name:'해안 삼각주', file:'world_tex_coast.js', key:'COAST' } }, sceneLoaded = {};
+  function updateSceneChips(){ Array.prototype.forEach.call(document.querySelectorAll('#sceneChips .chip'), function(c){ c.classList.toggle('on', c.getAttribute('data-scene') === curScene); }); }
+  function applyTextures(tex, ringArr, hazeRel){
+    if (!texLoaderRef || !domeMat) return;
+    function mk(src, repeat){ var t = texLoaderRef.load(src); t.anisotropy = anisoRef; t.wrapS = t.wrapT = repeat ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping; return t; }
+    ['N', 'E', 'S', 'W'].forEach(function(k){ wallMats[k].uniforms.map.value = mk(tex[k], false); wallMats[k].uniforms.mask.value = mk(tex['m' + k], false); });
+    domeMat.uniforms.map.value = mk(tex.sky, false); floorMesh.material.uniforms.map.value = mk(tex.floor, true);
+    var n = ringArr.length, rd = new Uint8Array(n * 4); for (var i = 0; i < n; i++){ rd[i * 4] = ringArr[i][0]; rd[i * 4 + 1] = ringArr[i][1]; rd[i * 4 + 2] = ringArr[i][2]; rd[i * 4 + 3] = 255; }
+    var rt = new THREE.DataTexture(rd, n, 1, THREE.RGBAFormat); rt.magFilter = rt.minFilter = THREE.LinearFilter; rt.wrapS = THREE.RepeatWrapping; rt.generateMipmaps = false; rt.needsUpdate = true; domeMat.uniforms.ring.value = rt;
+    sceneHaze = hazeRel;
+  }
+  function setScene(key, quiet){
+    if (!SCENEDEF[key]) return; curScene = key; try { localStorage.setItem('dinoScene', key); } catch (err) {} updateSceneChips();
+    if (key === 'plain'){ applyTextures(window.TEX, window.RING, [1, 1, 1]); if (!quiet) envToast('장소: ' + SCENEDEF[key].name); return; }
+    function go(){ var S = window['SCENE_' + SCENEDEF[key].key]; applyTextures(window['TEX_' + SCENEDEF[key].key], window['RING_' + SCENEDEF[key].key], [S.haze[0] / 0.86, S.haze[1] / 0.78, S.haze[2] / 0.66]); if (!quiet) envToast('장소: ' + SCENEDEF[key].name); }
+    if (sceneLoaded[key]){ go(); return; }
+    envToast('풍경을 불러오는 중…');
+    var sc = document.createElement('script'); sc.src = SCENEDEF[key].file;
+    sc.onload = function(){ sceneLoaded[key] = true; go(); }; sc.onerror = function(){ curScene = 'plain'; updateSceneChips(); envToast('풍경 파일을 찾지 못했어요 (' + SCENEDEF[key].file + ')'); };
+    document.head.appendChild(sc);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('#sceneChips .chip'), function(c){ c.addEventListener('click', function(){ setScene(c.getAttribute('data-scene')); }); });
+  (function(){ var want = null; try { want = (location.search.match(/[?&]scene=([a-z]+)/) || [])[1] || localStorage.getItem('dinoScene'); } catch (err) {} updateSceneChips();
+    if (want && want !== 'plain' && SCENEDEF[want]) setTimeout(function(){ setScene(want, true); }, 400); })();
+  window.__scene = { set: setScene };
+
   /* 배경 동물: 영상은 화면이 다 열린 뒤에 천천히 받아요 */
   var IS_TOUCH_AMB = (window.matchMedia && matchMedia('(pointer:coarse)').matches) || /[?&]touch=1/.test(location.search);
   var AMBDEF = [
+    { sp:'boreal', file:'boreal_side_walk.webm', kind:'walk', view:'side', lat:7, dep:9, wander:6, speed:0.45, rate:0.9 },
+    { sp:'basil', file:'basil_side_walk.webm', kind:'walk', view:'side', lat:-6, dep:8, wander:4, speed:0.18, rate:0.8, small:true },
+    { sp:'frog', file:'frog_side_idle.webm', kind:'graze', view:'side', lat:-2.5, dep:6, flip:1, small:true },
+    { sp:'cimol', file:'cimol_side_walk.webm', kind:'walk', view:'side', lat:3.5, dep:5, wander:3, speed:0.9, rate:1, small:true },
+    { sp:'apalone', file:'apalone_side_walk.webm', kind:'walk', view:'side', lat:-11, dep:11, wander:3, speed:0.3, rate:0.85, small:true, desk:true },
+    { sp:'didel', file:'didel_side_walk.webm', kind:'walk', view:'side', lat:11, dep:12, wander:5, speed:0.6, rate:0.9, small:true, desk:true },
+    { sp:'alpha', file:'alpha_side_walk.webm', kind:'walk', view:'side', lat:-8, dep:14, wander:5, speed:0.8, rate:0.9, small:true, desk:true },
+    { sp:'menis', file:'menis_side_walk.webm', kind:'walk', view:'side', lat:5, dep:15, wander:4, speed:0.5, rate:0.9, small:true, desk:true },
     { sp:'edmo', file:'edmo_side_walk.webm', kind:'walk', view:'side', lat:-30, dep:44, wander:30, speed:1.0, rate:0.85 },
     { sp:'edmo', file:'edmo_side_walk.webm', kind:'walk', view:'side', lat:-22, dep:50, wander:30, speed:1.15, rate:0.9 },
     { sp:'ptero', file:'ptero_f_side_flap.webm', kind:'fly', view:'f_side', lat:-90, dep:50, alt:20, speed:7.5, rate:0.8, dir:1 },
@@ -1079,10 +1141,10 @@
       if (!show){ if (a.shown){ a.el.style.display = 'none'; a.v.pause(); a.shown = false; } continue; }
       var d = a.d, vx = rx * a.dir, vz = rz * a.dir;
       if (d.kind === 'walk'){
-        var sp = d.speed * SPECIES[d.sp].SCALE[d.view] * 1.05;
+        var sp = d.speed * SPECIES[d.sp].SCALE[d.view] * 1.05 * (d.small ? AMB.big : 1);
         a.x += vx * sp * dt; a.z += vz * sp * dt;
         var ox = a.x - a.hx, oz = a.z - a.hz;
-        if (Math.hypot(ox, oz) > d.wander && (ox * vx + oz * vz) > 0) a.dir = -a.dir;
+        if (Math.hypot(ox, oz) > d.wander * (d.small ? AMB.big : 1) && (ox * vx + oz * vz) > 0) a.dir = -a.dir;
         a.flip = a.dir > 0 ? 1 : -1;
       } else if (d.kind === 'fly'){
         if (a.wait > 0){ a.wait -= dt; if (a.wait <= 0){ a.dir = -a.dir; var cx0 = cam.tx, cz0 = cam.tz; a.x = cx0 + fx * d.dep - rx * a.dir * 100; a.z = cz0 + fz * d.dep - rz * a.dir * 100; a.hidden = false; } }
@@ -1095,7 +1157,7 @@
       }
       var dep = (a.x - camera.position.x) * fx + (a.z - camera.position.z) * fz;
       if (a.hidden || dep < 4){ if (a.shown){ a.el.style.display = 'none'; a.v.pause(); a.shown = false; } continue; }
-      var f0 = proj(a.x, a.y, a.z, W, H), f1 = proj(a.x, a.y + a.hd, a.z, W, H);
+      var f0 = proj(a.x, a.y, a.z, W, H), f1 = proj(a.x, a.y + a.hd * (d.small ? AMB.big : 1), a.z, W, H);
       var ah = Math.max(3, f0.y - f1.y), sw = ah * 620 / a.refH, sh = sw * ASPECT;
       if (f0.x < -sw || f0.x > W + sw || f0.y < -sh * 0.3 || f0.y > H + sh){ if (a.shown){ a.el.style.display = 'none'; a.v.pause(); a.shown = false; } continue; }
       if (!a.shown){ a.el.style.display = 'block'; var pr = a.v.play(); if (pr && pr.catch) pr.catch(function(){}); a.shown = true; }
@@ -1111,7 +1173,7 @@
     for (j = 0; j < 3; j++){ envNow.t[j] += (P.tint[j] - envNow.t[j]) * kk; envNow.h[j] += (P.haze[j] - envNow.h[j]) * kk; }
     envNow.b += (P.bright - envNow.b) * kk; envNow.s += (P.sat - envNow.s) * kk; envNow.vig += (P.vig - envNow.vig) * kk;
     ENVU.tint.value.set(envNow.t[0], envNow.t[1], envNow.t[2]); ENVU.bright.value = envNow.b; ENVU.sat.value = envNow.s;
-    if (floorMesh && floorMesh.material && floorMesh.material.uniforms.haze) floorMesh.material.uniforms.haze.value.setRGB(envNow.h[0], envNow.h[1], envNow.h[2]);
+    if (floorMesh && floorMesh.material && floorMesh.material.uniforms.haze) floorMesh.material.uniforms.haze.value.setRGB(envNow.h[0] * sceneHaze[0], envNow.h[1] * sceneHaze[1], envNow.h[2] * sceneHaze[2]);
     vigEl.style.opacity = envNow.vig.toFixed(3);
     // 비: 화면 위로 가는 빗줄기
     rainAmt += ((P.rain ? 1 : 0) - rainAmt) * kk;
@@ -1201,9 +1263,9 @@
         var th = Math.atan2(Math.abs(d), Math.abs(c)) * 180 / Math.PI;
         st.band = SP.bands12 ? bandFor12(th, st.band) : bandFor(th, st.band);
         var want = SP.bands12 ? (d >= 0 ? ['side', 'v60', 'f34', 'front'] : ['side', 'v120', 'v150', 'back'])[st.band] : (st.band === 0 ? 'side' : st.band === 1 ? (d >= 0 ? 'f34' : 'r34') : (d >= 0 ? 'front' : 'back'));
-        if (air) show(usableF(want), shiftDown ? 'glide' : 'flap'); else show(usable(want), 'walk');
+        if (air) show(usableF(want), shiftDown ? 'glide' : 'flap'); else { var uv = usable(want), fastOK = !!(SP.fastClip && shiftDown); if (fastOK && !has(uv, 'fast')) need(uv + ':fast'); show(uv, (fastOK && has(uv, 'fast')) ? 'fast' : 'walk'); }
         var rate = currentRate();
-        if (vids[st.key]) vids[st.key].playbackRate = air ? ((SP.glideRate && /:glide$/.test(st.key)) ? (SP.glideRate[st.view] || 1) : 1) : rate * spinMul(st.view);
+        if (vids[st.key]) vids[st.key].playbackRate = air ? ((SP.glideRate && /:glide$/.test(st.key)) ? (SP.glideRate[st.view] || 1) : 1) : rate * spinMul(st.view) / ((SP.fastClip && st.action === 'fast') ? 1.6 : 1);
         // 도는 동안은 속도를 줄이고, 이동은 지금 몸이 향한 방향으로 합니다
         var sp = 1 - opt.slow * Math.min(1, err / 90);
         walk(c, d, vxM * SCALE[st.view] * rate * sp, vzM * rate * sp);
@@ -1237,6 +1299,7 @@
       try { envFrame(dt, W, H, fx, fz, rx, rz); } catch (err) { if (window.console && !window.__envErr){ window.__envErr = 1; console.warn('env', err); } }
       try { stepTick(); } catch (err) { if (window.console && !window.__stepErr){ window.__stepErr = 1; console.warn('steps', err); } }
       try { wingTick(); } catch (err) { if (window.console && !window.__wingErr){ window.__wingErr = 1; console.warn('wings', err); } }
+      try { engineTick(dt); } catch (err) { if (window.console && !window.__engErr){ window.__engErr = 1; console.warn('engine', err); } }
 
       // 그림자: 몸이 향한 월드 방향으로 길쭉하게
       var hc = Math.cos(st.hd), hs = Math.sin(st.hd);
