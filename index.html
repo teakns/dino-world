@@ -294,10 +294,10 @@
     ptero:{ name:'익룡 (헬크릭 아즈다르키드)', sounds:{ roar:'roar_ptero.mp3' }, soundsSci:{ roar:'roar_ptero_sci.mp3' }, capSci:"익룡의 울음은 증거가 거의 없어요. 황새처럼 부리를 부딪치거나 꺽꺽거렸을 거라고 상상해서 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'ptero_steps.wav', wings:'ptero_wings.wav', hd:2.0, refH:258, shadow:[1.9,1.3], speed:0.9, airSpeed:2.2, alt:5, flight:true, glideRate:{ f_side:0.5 },
             once:['roar','look','tail','takeoff','land'], onceTail:true,
             FOOT:{"side": 0.882, "f_side": 0.846, "front": 0.882, "f_front": 0.882, "f34": 0.882, "f_f34": 0.834, "back": 0.882, "f_back": 0.882, "r34": 0.876, "f_r34": 0.828}, SCALE:{"side": 1.223, "f_side": 1.229, "front": 0.985, "f_front": 0.993, "f34": 1.0, "f_f34": 1.183, "back": 1.0, "f_back": 1.016, "r34": 0.992, "f_r34": 1.194}, GAIT:{"side": {"p": 0.792, "t0": 0.875}, "front": {"p": 1.208, "t0": 1.458}, "f34": {"p": 1.375, "t0": 0.792}, "back": {"p": 1.083, "t0": 1.333}, "r34": {"p": 0.792, "t0": 0.708}} },
-    truck:{ name:'탐사 사파리 차량', hd:2.9, refH:201, shadow:[3.0,1.4], speed:1.9, once:['roar'], fastClip:true, noShake:true, lblRoar:'경적', lblStep:'엔진 소리',
-            sounds:{ roar:'truck_horn.mp3' }, engine:{ idle:'truck_idle.wav', drive:'truck_drive.wav', fast:'truck_fast.wav' },
-            FOOT:{side:0.799,front:0.799,back:0.799,f34:0.799,r34:0.799}, SCALE:{side:1,front:1,back:1,f34:1,r34:1},
-            GAIT:{side:{p:1.458,t0:0},front:{p:2.5,t0:0},back:{p:1.708,t0:0},f34:{p:1.333,t0:0},r34:{p:1.167,t0:0}} },
+    truck:{ name:'탐사 사파리 차량', hd:2.9, refH:299, shadow:[3.0,1.4], speed:1.9, once:[], hornOnly:true, lblRoar:'경적', lblStep:'엔진 소리', sounds:{ roar:'truck_horn.mp3' }, engine:{ idle:'truck_idle.wav', drive:'truck_drive.wav', fast:'truck_fast.wav' },
+            FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879, "v60": 0.88, "v120": 0.882, "v150": 0.882}, SCALE:{side:1,front:1,back:1,f34:1,r34:1,v60:1,v120:1,v150:1},
+            GAIT:{side:{p:1.417,t0:0},front:{p:2.25,t0:0},back:{p:1.875,t0:0},f34:{p:1.125,t0:0},r34:{p:1.125,t0:0},v60:{p:1.167,t0:0},v120:{p:1.167,t0:0},v150:{p:1.167,t0:0}},
+            spin:{side:1,f34:1,r34:1,front:1.4,back:1.4,v60:1,v120:1,v150:1}, spinShift:1.12, bands12:true },
     edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, soundsSci:{ roar:'roar_edmo_sci.mp3' }, capSci:"학자 추정: 새와 악어의 친척이라 오리처럼 낮게 꽥꽥거렸을 수 있다는 의견이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
             FOOT:{"side": 0.882, "front": 0.882, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.15, "front": 1.0, "f34": 1.02, "back": 0.949, "r34": 0.963}, GAIT:{"side": {"p": 1.042, "t0": 0.625}, "front": {"p": 0.875, "t0": 0.917}, "f34": {"p": 0.792, "t0": 0.583}, "back": {"p": 0.792, "t0": 1.25}, "r34": {"p": 0.792, "t0": 1.208}} },
     anky:{ name:'안킬로사우루스', sounds:{ roar:'roar_anky.mp3' }, soundsSci:{ roar:'roar_anky_sci.mp3' }, capSci:"학자 추정: 안킬로사우루스류의 후두를 분석한 연구에서 새처럼 크고 터지는 듯한 소리를 냈을 가능성이 제안됐어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'anky_step_a.wav', hd:1.8, refH:210, shadow:[3.3,1.6], speed:0.8,
@@ -358,7 +358,7 @@
   }
   function TRUCK_CLIPS(){
     var o = {};
-    ['side','front','back','f34','r34'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm', fast:'truck_' + v + '_fast.webm', roar:'truck_' + v + '_roar.webm' }; });
+    ['side','front','f34','back','v60','v120','v150'].forEach(function(v){ o[v] = { idle:'truck_' + v + '_idle.webm', walk:'truck_' + v + '_walk.webm', rev:'truck_' + v + '_walk_rev.webm' }; });
     return o;
   }
   function PTERO_CLIPS(){
@@ -380,7 +380,7 @@
     var o = {}, A = { side:['idle','walk','rev','eat','roar'], front:['idle','walk','rev','eat','roar'], f34:['idle','walk','rev','eat','roar'], back:['idle','walk','rev','look','tail'], r34:['idle','walk','rev','look','tail'] };
     Object.keys(A).forEach(function(v){ o[v] = {}; A[v].forEach(function(a){ o[v][a] = 'trex_' + v + '_' + (a === 'rev' ? 'walk_rev' : a) + '.webm'; }); });
     return o; })();
-  var REQ_KEYS = { 'side:idle':true, 'side:walk':true }; if (SP_ID === 'truck'){ ['side', 'front', 'back', 'f34', 'r34'].forEach(function(v){ REQ_KEYS[v + ':roar'] = true; }); }   // 화면을 열 때 꼭 필요한 영상
+  var REQ_KEYS = { 'side:idle':true, 'side:walk':true };   // 화면을 열 때 꼭 필요한 영상
   var FOOT = SP.FOOT;
   var SCALE = SP.SCALE;
   /* 방향마다 걷는 영상의 걸음 주기(초)와, 몸이 가장 낮아지는 기준 시점(초). 방향이 바뀔 때 걸음 위치를 이어 주는 데 씁니다. */
@@ -393,7 +393,7 @@
   var VLABEL_F = { f_side:'옆모습 (비행)', f_f34:'앞 비스듬히 (비행)', f_front:'정면 (비행)', f_r34:'뒤 비스듬히 (비행)', f_back:'뒷모습 (비행)' };
   for (var vk in VLABEL_F) VLABEL[vk] = VLABEL_F[vk];
   LABEL.flap = '날갯짓'; LABEL.glide = '활강'; LABEL.takeoff = '이륙'; LABEL.land = '착륙'; if (SP.onceTail) LABEL.tail = '날개 펴기';
-  if (SP_ID === 'truck'){ LABEL.idle = '정차'; LABEL.walk = '주행'; LABEL.rev = '후진'; LABEL.fast = '빠른 주행'; LABEL.roar = '경적'; }
+  if (SP_ID === 'truck'){ LABEL.idle = '정차'; LABEL.walk = '주행'; LABEL.rev = '후진'; }
   var ASPECT = 338/620;
 
   var st = { wx:0, wz:0, face:1, view:'side', action:'', key:'', lock:false, hd:0, band:0, air:0, alt:0 };
@@ -696,6 +696,7 @@
     } else if (st.air === 2){ need(usableF(baseView(st.view)) + ':land'); st.air = 3; }
   }
   function startOnce(act){
+    if (act === 'roar' && SP.hornOnly){ playSound('roar'); return; }
     if (st.lock || st.air) return;
     var tv = (CLIPS[st.view] && CLIPS[st.view][act]) ? st.view : 'side';
     if (!(CLIPS[tv] && CLIPS[tv][act])) return;
@@ -827,7 +828,7 @@
       ['pointerup', 'pointercancel'].forEach(function(t){ b.addEventListener(t, function(){ delete keys[key]; b.classList.remove('on'); }); });
     }
     function tapBtn(b, fn){ b.addEventListener('pointerdown', function(e){ e.preventDefault(); b.classList.add('on'); setTimeout(function(){ b.classList.remove('on'); }, 170); fn(); }); }
-    if (hasAct('roar')) tapBtn(mkBtn('📣<br>' + (SP.lblRoar || '울음')), function(){ startOnce('roar'); });
+    if (hasAct('roar') || SP.hornOnly) tapBtn(mkBtn('📣<br>' + (SP.lblRoar || '울음')), function(){ startOnce('roar'); });
     if (hasAct('eat')) holdBtn(mkBtn('🌿<br>먹기'), 'e');
     if (hasAct('look')) tapBtn(mkBtn('👀<br>돌아보기'), function(){ if (REAR[st.view]) startOnce('look'); });
     if (hasAct('tail')){
@@ -968,20 +969,49 @@
     var i = Math.floor(Math.random() * files.length); if (i === stepLastVar) i = (i + 1) % files.length; stepLastVar = i;
     return playSample(files[i], (STEPVOL[SP_ID] || 0.6) * (0.88 + Math.random() * 0.24), 0.96 + Math.random() * 0.08);
   }
-  /* 엔진 소리: 정차 · 주행 · 빠른 주행 반복 소리를 지금 동작에 맞춰 서서히 바꿔 틀어요 (사파리 차량) */
-  var ENG = null;
-  function engineTick(dt){
+  /* 엔진 소리: 정차 · 주행 · 빠른 주행 반복 소리 3개를 계속 돌려 두고, 지금 동작에 맞춰 크기만 서서히 바꿔요 (끄고 켜지 않아서 끊기지 않아요) */
+  var ENG = null, engMove = 0, engTry = 0;
+  var ENG_VOL = { idle:0.30, drive:0.55, fast:0.85 };
+  function engineInit(){
+    ENG = { ok:false, mode:'', L:{ idle:{ g:0 }, drive:{ g:0 }, fast:{ g:0 } }, ctx:null }; window.__eng = ENG;
+    var Ctx = window.AudioContext || window.webkitAudioContext, names = ['idle', 'drive', 'fast'];
+    function htmlFallback(){
+      ENG.mode = 'html'; names.forEach(function(k){ var a = new Audio(SP.engine[k]); a.loop = true; a.volume = 0; a.preload = 'auto'; try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (err) {} ENG.L[k].a = a; });
+      ENG.ok = true;
+    }
+    if (!Ctx || !window.fetch){ htmlFallback(); return; }
+    try { ENG.ctx = new Ctx(); } catch (err) { htmlFallback(); return; }
+    var left = names.length, failed = false;
+    names.forEach(function(k){
+      fetch(SP.engine[k]).then(function(r){ if (!r.ok) throw 0; return r.arrayBuffer(); }).then(function(ab){
+        return new Promise(function(res, rej){ ENG.ctx.decodeAudioData(ab, res, rej); });
+      }).then(function(buf){
+        var src = ENG.ctx.createBufferSource(); src.buffer = buf; src.loop = true; var g = ENG.ctx.createGain(); g.gain.value = 0; src.connect(g); g.connect(ENG.ctx.destination);
+        ENG.L[k].src = src; ENG.L[k].gain = g; left--; if (left === 0 && !failed){ names.forEach(function(n){ ENG.L[n].src.start(0); }); ENG.mode = 'web'; ENG.ok = true; }
+      }).catch(function(){ if (!failed){ failed = true; htmlFallback(); } });
+    });
+  }
+  function engineTick(dt0){
     if (!SP.engine) return;
-    if (!ENG){ ENG = {}; ['idle', 'drive', 'fast'].forEach(function(k){ var a = new Audio(SP.engine[k]); a.loop = true; a.volume = 0; a.preload = 'auto'; try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (err) {} ENG[k] = { a:a, g:0, t:0 }; }); window.__eng = ENG; }
-    var act = st.action, moving = (act === 'walk' || act === 'rev' || act === 'fast');
-    var tgt = { idle: (moving ? 0 : 1), drive: ((moving && act !== 'fast') ? 1 : 0), fast: (act === 'fast' ? 1 : 0) }, VOL = { idle:0.30, drive:0.55, fast:0.85 }, now = performance.now();
+    var nowT = performance.now(), dt = Math.min(0.5, (nowT - (engineTick.t || nowT)) / 1000); engineTick.t = nowT;          // 화면이 느려도 소리는 실제 시간으로 바뀌어요
+    if (!ENG) engineInit();
+    if (!ENG.ok) return;
+    var now = performance.now(), act = st.action;
+    if (act === 'walk' || act === 'rev' || act === 'fast' || ((keys.ArrowLeft || keys.ArrowRight || keys.ArrowUp || keys.ArrowDown || keys.w) && !st.lock)) engMove = now;
+    var moving = (now - engMove) < 300, fast = moving && shiftDown && act !== 'rev';          // 잠깐 멈칫해도 정차 소리로 바뀌지 않게 0.3초 여유
+    var tgt = { idle: moving ? 0 : 1, drive: (moving && !fast) ? 1 : 0, fast: fast ? 1 : 0 };
+    if (ENG.mode === 'web' && ENG.ctx.state === 'suspended' && now - engTry > 500){ engTry = now; try { ENG.ctx.resume(); } catch (err) {} }
     ['idle', 'drive', 'fast'].forEach(function(k){
-      var e = ENG[k]; e.g += (tgt[k] - e.g) * Math.min(1, dt * 5);
-      var on = sndStepOn && e.g > 0.02;
-      e.a.volume = on ? Math.min(1, VOL[k] * e.g) : 0;
-      if (k === 'drive') e.a.playbackRate = (act === 'rev') ? 0.82 : 1.0;
-      if (on && e.a.paused && now - e.t > 600){ e.t = now; var p = e.a.play(); if (p && p.catch) p.catch(function(){}); }
-      else if (!on && !e.a.paused && e.g <= 0.02) e.a.pause();
+      var e = ENG.L[k]; e.g += (tgt[k] - e.g) * Math.min(1, dt * 6);
+      var v = sndStepOn ? ENG_VOL[k] * e.g : 0;
+      if (ENG.mode === 'web'){
+        e.gain.gain.setTargetAtTime(v, ENG.ctx.currentTime, 0.05);
+        if (k === 'drive') e.src.playbackRate.setTargetAtTime(act === 'rev' ? 0.85 : 1.0, ENG.ctx.currentTime, 0.15);
+      } else if (e.a){
+        e.a.volume = Math.max(0, Math.min(1, v));
+        if (k === 'drive') e.a.playbackRate = (act === 'rev') ? 0.85 : 1.0;
+        if (e.a.paused && now - engTry > 500){ engTry = now; var pr = e.a.play(); if (pr && pr.catch) pr.catch(function(){}); }          // 한 번 시작하면 끄지 않고 소리만 0으로
+      }
     });
   }
   function stepTick(){
