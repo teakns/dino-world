@@ -301,8 +301,8 @@
             FOOT:{"side": 0.882, "f_side": 0.846, "front": 0.882, "f_front": 0.882, "f34": 0.882, "f_f34": 0.834, "back": 0.882, "f_back": 0.882, "r34": 0.876, "f_r34": 0.828}, SCALE:{"side": 1.223, "f_side": 1.229, "front": 0.985, "f_front": 0.993, "f34": 1.0, "f_f34": 1.183, "back": 1.0, "f_back": 1.016, "r34": 0.992, "f_r34": 1.194}, GAIT:{"side": {"p": 0.792, "t0": 0.875}, "front": {"p": 1.208, "t0": 1.458}, "f34": {"p": 1.375, "t0": 0.792}, "back": {"p": 1.083, "t0": 1.333}, "r34": {"p": 0.792, "t0": 0.708}} },
     truck:{ name:'탐사 사파리 차량', hd:2.9, refH:299, shadow:[3.0,1.4], speed:1.9, once:[], hornOnly:true, lblRoar:'경적', lblStep:'엔진 소리', sounds:{ roar:'truck_horn.mp3' }, engine:{ idle:'truck_idle.wav', drive:'truck_drive.wav', fast:'truck_fast.wav' },
             FOOT:{"f34": 0.882, "side": 0.882, "r34": 0.882, "front": 0.882, "back": 0.879, "v60": 0.88, "v120": 0.882, "v150": 0.882}, SCALE:{side:1,front:1,back:1,f34:1,r34:1,v60:1,v120:1,v150:1},
-            GAIT:{side:{p:1.417,t0:0},front:{p:2.25,t0:0},back:{p:1.875,t0:0},f34:{p:1.667,t0:0},r34:{p:1.667,t0:0},v60:{p:1.667,t0:0},v120:{p:1.667,t0:0},v150:{p:1.667,t0:0}},
-            spin:{side:1,f34:1,r34:1,front:1.4,back:1.4,v60:1,v120:1,v150:1}, spinShift:1.12, bands12:true },
+            GAIT:{side:{p:1.417,t0:0},front:{p:2.25,t0:0},back:{p:1.875,t0:0},f34:{p:1.25,t0:0},r34:{p:1.25,t0:0},v60:{p:1.25,t0:0},v120:{p:1.25,t0:0},v150:{p:1.25,t0:0}},
+            spin:{side:1.3,f34:1.35,r34:1.35,front:4.6,back:4.6,v60:1.35,v120:1.35,v150:1.35}, spinShift:1.2, bands12:true },
     edmo:{ name:'에드몬토사우루스', sounds:{ roar:'roar_edmo.mp3' }, soundsSci:{ roar:'roar_edmo_sci.mp3' }, capSci:"학자 추정: 새와 악어의 친척이라 오리처럼 낮게 꽥꽥거렸을 수 있다는 의견이 있어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'edmo_steps.wav', hd:3.6, refH:206, shadow:[5.0,1.8], speed:1.1,
             FOOT:{"side": 0.882, "front": 0.882, "f34": 0.882, "back": 0.882, "r34": 0.882}, SCALE:{"side": 1.15, "front": 1.0, "f34": 1.02, "back": 0.949, "r34": 0.963}, GAIT:{"side": {"p": 1.042, "t0": 0.625}, "front": {"p": 0.875, "t0": 0.917}, "f34": {"p": 0.792, "t0": 0.583}, "back": {"p": 0.792, "t0": 1.25}, "r34": {"p": 0.792, "t0": 1.208}} },
     anky:{ name:'안킬로사우루스', sounds:{ roar:'roar_anky.mp3' }, soundsSci:{ roar:'roar_anky_sci.mp3' }, capSci:"학자 추정: 안킬로사우루스류의 후두를 분석한 연구에서 새처럼 크고 터지는 듯한 소리를 냈을 가능성이 제안됐어요. 컴퓨터로 만든 소리예요 (영상 속 동작은 그대로예요).", steps:'anky_step_a.wav', hd:1.8, refH:210, shadow:[3.3,1.6], speed:0.8,
@@ -977,50 +977,57 @@
     return playSample(files[i], (STEPVOL[SP_ID] || 0.6) * (0.88 + Math.random() * 0.24), 0.96 + Math.random() * 0.08);
   }
   /* 엔진 소리: 평평하게 다듬은 반복 소리 3개(정차·주행·빠른 주행)를 계속 돌려 두고,
-     움직임에 따라 크기와 음높이만 부드럽게 바꿔요. 소리를 끄고 켜지 않아서 끊기지 않고,
-     음이 올라가는 "위이이~잉"은 반복 소리가 아니라 음높이를 연속으로 올려서 만들어요 */
+     움직임에 따라 크기와 음높이만 바꿔요 (끄고 켜지 않아서 끊기지 않아요).
+     · 소리 파일은 truck_engine_data.js 안에 들어 있어서 파일로 열어도 끊김 없는 방식으로 재생돼요
+     · 반복은 3번 이어 붙인 소리의 가운데 한 칸만 돌려서 반복 지점이 소리 가장자리에 닿지 않아요
+     · 소리 버퍼를 크게(playback) 잡아서 화면이 무거워도 소리가 밀리지 않아요
+     · 크기·음높이의 부드러운 변화는 소리 쪽에서 처리하고, 상태가 바뀔 때만 한 번 예약해요 */
   var ENG = null, engMove = 0, engTry = 0;
   var ENG_VOL = { idle:0.30, drive:0.55, fast:0.85 };
+  function engB64(b){ var bin = atob(b), n = bin.length, u = new Uint8Array(n); for (var i = 0; i < n; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
   function engineInit(){
-    ENG = { ok:false, mode:'', L:{ idle:{}, drive:{}, fast:{} }, ctx:null, m:0, q:0 }; window.__eng = ENG;
+    ENG = { ok:false, mode:'', L:{ idle:{}, drive:{}, fast:{} }, ctx:null, sk:'' }; window.__eng = ENG;
     var Ctx = window.AudioContext || window.webkitAudioContext, names = ['idle', 'drive', 'fast'];
     function htmlFallback(){
       ENG.mode = 'html'; names.forEach(function(k){ var a = new Audio(SP.engine[k]); a.loop = true; a.volume = 0; a.preload = 'auto'; try { a.preservesPitch = false; a.mozPreservesPitch = false; a.webkitPreservesPitch = false; } catch (err) {} ENG.L[k].a = a; });
       ENG.ok = true;
     }
-    if (!Ctx || !window.fetch){ htmlFallback(); return; }
-    try { ENG.ctx = new Ctx(); } catch (err) { htmlFallback(); return; }
-    var left = names.length, failed = false;
-    names.forEach(function(k){
-      fetch(SP.engine[k]).then(function(r){ if (!r.ok) throw 0; return r.arrayBuffer(); }).then(function(ab){
-        return new Promise(function(res, rej){ ENG.ctx.decodeAudioData(ab, res, rej); });
-      }).then(function(buf){
-        var c = ENG.ctx, g = c.createGain(); g.gain.value = 0; g.connect(c.destination); var srcs = [];
-        [0, 1].forEach(function(n){ var src = c.createBufferSource(); src.buffer = buf; src.loop = true; var h = c.createGain(); h.gain.value = 0.5; src.connect(h); h.connect(g); srcs.push(src); });
-        ENG.L[k].gain = g; ENG.L[k].srcs = srcs; ENG.L[k].dur = buf.duration; left--;
-        if (left === 0 && !failed){ names.forEach(function(nm){ var L = ENG.L[nm]; L.srcs[0].start(0); L.srcs[1].start(0, L.dur * 0.5); }); ENG.mode = 'web'; ENG.ok = true; }
-      }).catch(function(){ if (!failed){ failed = true; htmlFallback(); } });
-    });
+    function startWeb(){
+      var c; try { c = new Ctx({ latencyHint:'playback' }); } catch (e1) { try { c = new Ctx(); } catch (e2) { htmlFallback(); return; } }
+      ENG.ctx = c; var master = c.createGain(); master.gain.value = 1; master.connect(c.destination); ENG.master = master; var left = names.length, failed = false;
+      names.forEach(function(k){
+        var ab; try { ab = engB64(window.ENGINE_B64[k]); } catch (e3) { if (!failed){ failed = true; htmlFallback(); } return; }
+        new Promise(function(res, rej){ var p = c.decodeAudioData(ab, res, rej); if (p && p.catch) p.catch(rej); }).then(function(buf){
+          var g = c.createGain(); g.gain.value = 0; g.connect(master); var third = buf.duration / 3, srcs = [];
+          [0, 1].forEach(function(n){ var src = c.createBufferSource(); src.buffer = buf; src.loop = true; src.loopStart = third; src.loopEnd = 2 * third; var h = c.createGain(); h.gain.value = 0.5; src.connect(h); h.connect(g); srcs.push(src); });
+          ENG.L[k].gain = g; ENG.L[k].srcs = srcs; ENG.L[k].third = third; left--;
+          if (left === 0 && !failed){ names.forEach(function(nm){ var L = ENG.L[nm]; L.srcs[0].start(0, L.third); L.srcs[1].start(0, L.third * 1.5); }); ENG.mode = 'web'; ENG.ok = true; }          // 두 겹은 반 칸 어긋나게 시작
+        }).catch(function(){ if (!failed){ failed = true; htmlFallback(); } });
+      });
+    }
+    if (!Ctx){ htmlFallback(); return; }
+    if (window.ENGINE_B64){ startWeb(); return; }
+    var sc = document.createElement('script'); sc.src = 'truck_engine_data.js'; sc.onload = startWeb; sc.onerror = htmlFallback; document.head.appendChild(sc);
   }
   function engineTick(dt0){
     if (!SP.engine) return;
-    var nowT = performance.now(), dt = Math.min(0.5, (nowT - (engineTick.t || nowT)) / 1000); engineTick.t = nowT;          // 화면이 느려도 소리는 실제 시간으로 바뀌어요
     if (!ENG) engineInit();
     if (!ENG.ok) return;
-    var now = nowT, act = st.action;
+    var now = performance.now(), act = st.action;
     if (act === 'walk' || act === 'rev' || act === 'fast' || ((keys.ArrowLeft || keys.ArrowRight || keys.ArrowUp || keys.ArrowDown || keys.w) && !st.lock)) engMove = now;
-    var moving = (now - engMove) < 300, fast = moving && shiftDown && act !== 'rev';          // 잠깐 멈칫해도 정차 소리로 바뀌지 않게 0.3초 여유
-    ENG.m += ((moving ? 1 : 0) - ENG.m) * Math.min(1, dt * 3.0);                              // 출발·정지: 0.3초쯤 걸려 부드럽게
-    ENG.q += ((fast ? 1 : 0) - ENG.q) * Math.min(1, dt * 1.6);                                // 가속: 0.6초쯤 걸려 음이 서서히 올라가요
-    var m = ENG.m, q = ENG.q, rv = (act === 'rev') ? 0.86 : 1;
-    var G = { idle: 1 - m, drive: m * (1 - q), fast: m * q };
-    var R = { idle: 1, drive: (0.86 + 0.14 * m) * (1 + 0.45 * q) * rv, fast: (0.72 + 0.28 * q) * rv };
+    var moving = (now - engMove) < 300, fast = moving && shiftDown && act !== 'rev', rv = (act === 'rev') ? 0.86 : 1;          // 잠깐 멈칫해도 정차 소리로 바뀌지 않게 0.3초 여유
     if (ENG.mode === 'web' && ENG.ctx.state === 'suspended' && now - engTry > 500){ engTry = now; try { ENG.ctx.resume(); } catch (err) {} }
+    var key = [moving ? 1 : 0, fast ? 1 : 0, rv, sndStepOn ? 1 : 0, ENG.ctx ? ENG.ctx.state : 'h'].join();
+    var retry = (ENG.mode === 'html');
+    if (key === ENG.sk && !retry) return;                                               // 바뀐 게 없으면 아무것도 하지 않아요 (소리 쪽에 쌓이는 일이 없게)
+    ENG.sk = key;
+    var G = { idle: moving ? 0 : 1, drive: (moving && !fast) ? 1 : 0, fast: fast ? 1 : 0 };
+    var R = { idle: 1, drive: (moving ? 1 : 0.86) * (fast ? 1.45 : 1) * rv, fast: (fast ? 1 : 0.72) * rv };
     ['idle', 'drive', 'fast'].forEach(function(k){
       var L = ENG.L[k], v = sndStepOn ? ENG_VOL[k] * G[k] : 0;
       if (ENG.mode === 'web'){
-        var t = ENG.ctx.currentTime; L.gain.gain.setTargetAtTime(v, t, 0.04);
-        L.srcs[0].playbackRate.setTargetAtTime(R[k], t, 0.08); L.srcs[1].playbackRate.setTargetAtTime(R[k] * 1.011, t, 0.08);          // 두 겹을 아주 조금 다른 속도로 돌려 반복이 티 나지 않게
+        var t = ENG.ctx.currentTime, gp = L.gain.gain; gp.cancelScheduledValues(t); gp.setTargetAtTime(v, t, sndStepOn ? 0.12 : 0.04);          // 크기: 0.12초 시정수로 부드럽게
+        L.srcs.forEach(function(src, n){ var rp = src.playbackRate; rp.cancelScheduledValues(t); rp.setTargetAtTime(R[k] * (n ? 1.011 : 1), t, 0.25); });          // 음높이: 0.25초 시정수로 "위이이~잉"
       } else if (L.a){
         L.a.volume = Math.max(0, Math.min(1, v)); L.a.playbackRate = Math.max(0.5, Math.min(2.5, R[k]));
         if (L.a.paused && now - engTry > 500){ engTry = now; var pr = L.a.play(); if (pr && pr.catch) pr.catch(function(){}); }
